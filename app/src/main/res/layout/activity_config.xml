@@ -12,58 +12,78 @@
         android:orientation="horizontal">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:gravity="bottom"
+            android:layout_weight="0.5"
             android:orientation="vertical">
 
-            <Button
-                android:id="@+id/mkdirBtn"
-                android:layout_width="wrap_content"
+            <TextView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="mkdir" />
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:background="#FFFFFF"
+                android:gravity="center"
+                android:text="CLASS"
+                android:textColor="@color/colorPrimaryDark" />
 
-            <ImageButton
-                android:id="@+id/backBtn2"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:layout_marginRight="1dp"
-                android:adjustViewBounds="true"
-                android:scaleType="fitCenter"
-                android:src="@drawable/left_arrow" />
-
-            <ImageButton
-                android:id="@+id/nextBtn2"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:layout_marginLeft="1dp"
-                android:adjustViewBounds="true"
-                android:scaleType="fitCenter"
-                android:src="@drawable/righ_arrow" />
-        </LinearLayout>
-
-        <ScrollView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
-
-            <LinearLayout
-                android:id="@+id/pathListLL"
+            <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:background="#BDDFCC">
 
-            </LinearLayout>
-        </ScrollView>
+                <LinearLayout
+                    android:id="@+id/classList"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
 
-        <Button
-            android:id="@+id/closeConfigBtn"
+
+                </LinearLayout>
+            </ScrollView>
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="right"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="EDIT" />
+
+            <Button
+                android:id="@+id/addClassBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="ADD CLASS" />
+
+            <Button
+                android:id="@+id/resetBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="RESET" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/closeBtn"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
             android:text="×"
-            android:textColor="#DF013A" />
+            android:textColor="#F0000F" />
+
     </LinearLayout>
 
 </RelativeLayout>

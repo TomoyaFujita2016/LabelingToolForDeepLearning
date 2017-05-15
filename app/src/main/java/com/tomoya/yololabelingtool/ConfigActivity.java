@@ -2,7 +2,9 @@ package com.tomoya.yololabelingtool;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.nfc.Tag;
 import android.os.Build;
@@ -13,6 +15,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -24,100 +27,85 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class ConfigActivity extends Activity implements View.OnClickListener {
-    private Button closeButton;
-    private Button mkdirButton;
-    private ImageButton nextButton;
-    private ImageButton backButton;
-    private LinearLayout dirListLL;
-    TextView[] pathTV;
-    private String[] dirList;
+    private Button closeConfigBtn;
+    private Button resetBtn;
+    private Button addClassBtn;
+    private EditText editText;
+    private LinearLayout linearLayout;
+    private String[] classNameOutput;
+    private SharedPreferences classData;
+    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_config);
 
-        dirListLL = (LinearLayout) findViewById(R.id.pathListLL);
-        closeButton = (Button) findViewById(R.id.closeConfigBtn);
-        closeButton.setOnClickListener(this);
-        mkdirButton = (Button) findViewById(R.id.mkdirBtn);
-        mkdirButton.setOnClickListener(this);
-        nextButton = (ImageButton) findViewById(R.id.nextBtn2);
-        nextButton.setOnClickListener(this);
-        backButton = (ImageButton) findViewById(R.id.backBtn2);
-        backButton.setOnClickListener(this);
+        closeConfigBtn = (Button) findViewById(R.id.closeBtn);
+        closeConfigBtn.setOnClickListener(this);
+        resetBtn = (Button) findViewById(R.id.resetBtn);
+        resetBtn.setOnClickListener(this);
+        addClassBtn = (Button) findViewById(R.id.addClassBtn);
+        addClassBtn.setOnClickListener(this);
 
-        dirListLL.removeAllViews();
-        dirList = sdDirList("");
-        pathTV = new TextView[dirList.length];
-        for (int i = 0; i < pathTV.length; i++)
-            pathTV[i] = new TextView(this);
-        addTextViewToLL();
-
-
+        linearLayout = (LinearLayout) findViewById(R.id.classList);
+        editText = (EditText) findViewById(R.id.edit);
+        classData = getSharedPreferences("ClassDataSave", Context.MODE_PRIVATE);
     }
 
-    private void addTextViewToLL() {
-        dirListLL.removeAllViews();
-        dirList = sdDirList("");
-        for (int i = 0; i < dirList.length; i++) {
-            pathTV[i].setText("/" + dirList[i]);
-            pathTV[i].setTextSize(10 * getResources().getDisplayMetrics().density);
-            if (i % 2 != 0)
-                pathTV[i].setBackgroundColor(Color.DKGRAY);
-            if(i % 2 == 0)
-                pathTV[i].setBackgroundColor(Color.LTGRAY);
-            pathTV[i].setTextColor(Color.BLACK);
-            dirListLL.addView(pathTV[i]);
+    @Override
+    protected void onStart(){
+        super.onStart();
+        editor = classData.edit();
+        int classCnt = classData.getInt("ClassCount", 0);
+        for (int i = 0; i < classCnt; i ++){
+            TextView textView = new TextView(this);
+            textView.setText(classData.getString("ClassNum"+i, ""));
+            textView.setTextColor(Color.BLACK);
+            linearLayout.addView(textView);
         }
     }
-
-
-    private String[] sdDirList(String dirName) {
-
-        ArrayList<String> arraylistStr = new ArrayList<>();
-        String[] listStr;
-        File[] extDirs = getExternalFilesDirs(Environment.DIRECTORY_PICTURES);
-        String sdpath = extDirs[extDirs.length - 1].toString();
-        File sdPicDir = new File(sdpath + "/" + dirName);
-
-        File[] list = sdPicDir.listFiles();
-        for (int i = 0; i < list.length; i++) {
-            Log.d("LIST", list[i].getName());
-            if (list[i].isDirectory()) {
-                arraylistStr.add(list[i].getName());
-            }
-        }
-        listStr = new String[arraylistStr.size()];
-        for (int i = 0; i < arraylistStr.size(); i++) {
-            listStr[i] = arraylistStr.get(i);
-        }
-        return listStr;
-    }
-
-    private void mkdir(String path, String dirName) {
-        File file = new File(path + "/" + dirName);
-        if (!file.exists()) {
-            file.mkdir();
-        }
-
-    }
-
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.closeConfigBtn:
+            case R.id.closeBtn:
                 Intent intent = new Intent(this, MainActivity.class);
                 startActivity(intent);
                 break;
-            case R.id.mkdirBtn:
+            case R.id.addClassBtn:
+                addClassName();
+                outputViewName();
                 break;
-            case R.id.nextBtn:
+            case R.id.resetBtn:
+                linearLayout.removeAllViews();
+                editor.clear();
+                editor.commit();
                 break;
-            case R.id.backBtn:
-                break;
+
         }
 
     }
+
+    private void addClassName() {
+        String className;
+        className = editText.getText().toString();
+        TextView textView = new TextView(this);
+        textView.setText(className);
+        textView.setTextColor(Color.BLACK);
+        linearLayout.addView(textView);
+    }
+
+    private void outputViewName() {
+        classNameOutput = new String[linearLayout.getChildCount()];
+        editor = classData.edit();
+        for (int i = 0; i < linearLayout.getChildCount(); i++) {
+            TextView classNameTV = (TextView) linearLayout.getChildAt(i);
+            classNameOutput[i] = classNameTV.getText().toString();
+            editor.putString("ClassNum" + i, classNameOutput[i]);
+        }
+        editor.putInt("ClassCount", linearLayout.getChildCount());
+        editor.commit();
+    }
+
 }
