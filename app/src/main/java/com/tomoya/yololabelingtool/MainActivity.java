@@ -68,14 +68,40 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onStart() {
         super.onStart();
+
+
+    }
+    @Override
+    protected void onResume(){
+        super.onResume();
+
+        //get some data from SP
         classData = getSharedPreferences("ClassDataSave", MODE_PRIVATE);
         editor = classData.edit();
         classNum = classData.getInt("ClassCount", 0);
+
         if (classNum != 0)
             classNames = new String[classNum];
         for (int i = 0; i < classNum; i++) {
             classNames[i] = classData.getString("ClassNum" + i, "");
         }
+
+
+        classNumber = 0;
+        classNameText.setText("Class" + classNumber + ":" + classNames[classNumber]);
+
+
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+
+        importImagesFromSD();
+    }
+
+
+        private void importImagesFromSD(){
+
 
         File[] extDirs = getExternalFilesDirs(Environment.DIRECTORY_PICTURES);
         String sdpath = extDirs[extDirs.length - 1].toString();
@@ -86,25 +112,25 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
             imageCnt = 0;
             for (int i = 0; i < tmp_images.length; i++) {
-                if (tmp_images[i].isFile() && tmp_images[i].getPath().endsWith(".jpg") && tmp_images[i].getPath().endsWith(".png"))
+                if (tmp_images[i].isFile() && (tmp_images[i].getPath().endsWith(".jpg") || tmp_images[i].getPath().endsWith(".png")))
                     imageCnt++;
             }
             File[] images = new File[imageCnt];
             int n = 0;
             for (int i = 0; i < tmp_images.length; i++) {
                 if (tmp_images[i].isFile() && (tmp_images[i].getPath().endsWith(".jpg") || tmp_images[i].getPath().endsWith(".png"))) {
-                    images[n]= tmp_images[i];
-                    n ++;
+                    images[n] = tmp_images[i];
+                    n++;
                 }
 
             }
 
-            for (int i = 0; i < images.length; i++) {
-                for (int m = 0; m < images.length; m++) {
-                    if (images[m].compareTo(images[m + 1]) < 0) {
-                        tmp = images[m];
-                        images[m] = images[m + 1];
-                        images[m + 1] = tmp;
+            for (int i = 0; i < images.length - 1; i++) {
+                for (int j = images.length - 1; j > i; j--) {
+                    if (images[j].compareTo(images[j - 1]) < 0) {
+                        tmp = images[j - 1];
+                        images[j - 1] = images[j];
+                        images[j] = tmp;
                     }
                 }
             }
@@ -138,12 +164,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void onChangeClassBtn() {
+        classNumber++;
         Log.d(TAG, "Clicked onChangeButton");
         if (classNumber > classNum - 1)
             classNumber = 0;
         if (classNum != 0)
             classNameText.setText("Class" + classNumber + ":" + classNames[classNumber]);
-        classNumber++;
     }
 
     private void onClearBtn() {
