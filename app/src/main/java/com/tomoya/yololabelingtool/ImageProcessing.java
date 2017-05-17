@@ -41,6 +41,15 @@ public class ImageProcessing {
         bitmapHeight = bitmap.getHeight();
         bitmapWidth = bitmap.getWidth();
 
+        if(x < 0)
+            x = 0;
+        if (bitmapWidth < x)
+            x = bitmapWidth;
+        if(y < 0)
+            y = 0;
+        if(bitmapHeight < y)
+            y = bitmapHeight;
+
         if (x == bitmapWidth)
             x--;
         if (y == bitmapHeight)
@@ -101,6 +110,18 @@ public class ImageProcessing {
         tmpBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
         bitmapHeight = bitmap.getHeight();
         bitmapWidth = bitmap.getWidth();
+        int incrementX = 1;
+        int incrementY = 1;
+/*
+        if (startX < endX)
+            incrementX = 1;
+        else if (startX > endY)
+            incrementX = -1;
+        if (startY < endY)
+            incrementY = 1;
+        else if (startY > endY)
+            incrementY = -1;
+*/
 
 
         if (startX == bitmapWidth)
@@ -131,7 +152,7 @@ public class ImageProcessing {
             endY += lineThickness - endY;
 
         if (byPixel) {
-            for (int i = startX - lineThickness; i < endX + lineThickness; i++) {
+            for (int i = startX - lineThickness; i < endX + lineThickness; i += incrementX) {
                 for (idxLineThickness = 0; idxLineThickness < lineThickness + 1; idxLineThickness++) {
                     tmpBitmap.setPixel(i, startY + idxLineThickness, color);
                     tmpBitmap.setPixel(i, endY + idxLineThickness, color);
@@ -139,7 +160,7 @@ public class ImageProcessing {
                     tmpBitmap.setPixel(i, endY - idxLineThickness, color);
                 }
             }
-            for (int i = startY; i < endY; i++) {
+            for (int i = startY; i < endY; i+=incrementY) {
                 for (idxLineThickness = 0; idxLineThickness < lineThickness + 1; idxLineThickness++) {
                     tmpBitmap.setPixel(startX + idxLineThickness, i, color);
                     tmpBitmap.setPixel(endX + idxLineThickness, i, color);
@@ -154,7 +175,7 @@ public class ImageProcessing {
             pixels = new int[bitmapHeight * bitmapWidth];
             tmpBitmap.getPixels(pixels, 0, bitmapWidth, 0, 0, bitmapWidth, bitmapHeight);
 
-            for (int i = startX - lineThickness; i < endX + lineThickness + 1; i++) {
+            for (int i = startX - lineThickness; i < endX + lineThickness + 1; i+= incrementX) {
                 for (idxLineThickness = 0; idxLineThickness < lineThickness + 1; idxLineThickness++) {
                     pixels[i + (startY * bitmapWidth) - (idxLineThickness * bitmapWidth)] = color;
                     pixels[i + (endY * bitmapWidth) + (idxLineThickness * bitmapWidth)] = color;
@@ -162,7 +183,7 @@ public class ImageProcessing {
                     pixels[i + (endY * bitmapWidth) - (idxLineThickness * bitmapWidth)] = color;
                 }
             }
-            for (int i = startY; i < endY; i++) {
+            for (int i = startY; i < endY; i+=incrementY) {
                 for (idxLineThickness = 0; idxLineThickness < lineThickness + 1; idxLineThickness++) {
                     pixels[i * bitmapWidth + startX - idxLineThickness] = color;
                     pixels[i * bitmapWidth + endX + idxLineThickness] = color;
