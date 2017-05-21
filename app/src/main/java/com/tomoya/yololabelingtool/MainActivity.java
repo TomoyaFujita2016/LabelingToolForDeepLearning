@@ -206,44 +206,50 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private void importImagesFromSD() {
         File[] extDirs = getExternalFilesDirs(Environment.DIRECTORY_PICTURES);
-        sdPath = extDirs[extDirs.length - 1].toString();
+        if (extDirs.length != 1) {
 
-        File imagesDir = new File(sdPath + "/images");
-        if (!(imagesDir.exists()))
-            imagesDir.mkdir();
+            sdPath = extDirs[extDirs.length - 1].toString();
+
+            File imagesDir = new File(sdPath + "/images");
+            if (!(imagesDir.exists()))
+                imagesDir.mkdir();
 
 
-        tmpFiles = new File(imagesDir.getPath()).listFiles();
-        if (tmpFiles.length != 0) {
-            imageCount = 0;
-            for (int i = 0; i < tmpFiles.length; i++) {
-                if (tmpFiles[i].isFile() && (tmpFiles[i].getPath().endsWith(".jpg") || tmpFiles[i].getPath().endsWith(".png")))
-                    imageCount++;
-            }
-            images = new File[imageCount];
-            for (int i = 0, n = 0; i < tmpFiles.length; i++) {
-                if (tmpFiles[i].isFile() && (tmpFiles[i].getPath().endsWith(".jpg") || tmpFiles[i].getPath().endsWith(".png"))) {
-                    images[n] = tmpFiles[i];
-                    n++;
+            tmpFiles = new File(imagesDir.getPath()).listFiles();
+            if (tmpFiles.length != 0) {
+                imageCount = 0;
+                for (int i = 0; i < tmpFiles.length; i++) {
+                    if (tmpFiles[i].isFile() && (tmpFiles[i].getPath().endsWith(".jpg") || tmpFiles[i].getPath().endsWith(".png")))
+                        imageCount++;
                 }
-            }
-            for (int i = 0; i < images.length - 1; i++) {
-                for (int j = images.length - 1; j > i; j--) {
-                    if (images[j].compareTo(images[j - 1]) < 0) {
-                        tmp = images[j - 1];
-                        images[j - 1] = images[j];
-                        images[j] = tmp;
+                images = new File[imageCount];
+                for (int i = 0, n = 0; i < tmpFiles.length; i++) {
+                    if (tmpFiles[i].isFile() && (tmpFiles[i].getPath().endsWith(".jpg") || tmpFiles[i].getPath().endsWith(".png"))) {
+                        images[n] = tmpFiles[i];
+                        n++;
                     }
                 }
+                for (int i = 0; i < images.length - 1; i++) {
+                    for (int j = images.length - 1; j > i; j--) {
+                        if (images[j].compareTo(images[j - 1]) < 0) {
+                            tmp = images[j - 1];
+                            images[j - 1] = images[j];
+                            images[j] = tmp;
+                        }
+                    }
+                }
+                editor.putInt("ImageCount", images.length);
+                editor.commit();
             }
-            editor.putInt("ImageCount", images.length);
-            editor.commit();
         } else {
             Toast.makeText(this, "NOT FOUND IMAGE DATA !!", Toast.LENGTH_SHORT).show();
             editor.putInt("ImageCount", 0);
             editor.putInt("ImageNumber", 0);
             editor.commit();
-            imageView.setImageResource(R.drawable.main_image_view);
+            imageCount = 0;
+            imageNumber = 0;
+            imageNumTv.setText(0+ " / " + 0);
+            imageView.setImageResource(R.drawable.no_images);
         }
     }
 
@@ -276,9 +282,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inMutable = true;
             Bitmap bitmap = BitmapFactory.decodeFile(images[imgNumber].getPath(), options);
-            imageView.setImageBitmap(bitmap);
+            if (bitmap != null) {
+                imageView.setImageBitmap(bitmap);
+                //initialization();
+                // setImageNumToTv();
+            } else imageView.setImageResource(R.drawable.no_images);
         } else {
             Log.d("DisplayImage", " images.length:  < imageNumber: ");
+
         }
     }
 

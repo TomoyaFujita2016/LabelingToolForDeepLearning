@@ -131,7 +131,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="right"
             android:adjustViewBounds="true"
-            android:src="@drawable/main_image_view" />
+            android:src="@drawable/no_images" />
 
     </LinearLayout>
 
