@@ -51,12 +51,13 @@ public class ConfigActivity extends Activity implements View.OnClickListener {
         linearLayout = (LinearLayout) findViewById(R.id.classList);
         editText = (EditText) findViewById(R.id.edit);
         classData = getSharedPreferences("ClassDataSave", Context.MODE_PRIVATE);
+        editor = classData.edit();
     }
 
     @Override
     protected void onStart(){
         super.onStart();
-        editor = classData.edit();
+
         int classCnt = classData.getInt("ClassCount", 0);
         for (int i = 0; i < classCnt; i ++){
             TextView textView = new TextView(this);
