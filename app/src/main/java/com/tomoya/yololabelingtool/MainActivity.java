@@ -124,7 +124,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
+    public boolean onTouchEvent(MotionEvent event) {    //TODO change the way moving crossHair.
         int eventAction = event.getActionMasked();
         int pointerIndex = event.getActionIndex();
         int pointerID = event.getPointerId(pointerIndex);
