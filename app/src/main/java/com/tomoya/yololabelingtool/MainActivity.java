@@ -6,12 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Path;
-import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.os.Environment;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -23,20 +18,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.util.function.BiFunction;
 
 import static android.content.ContentValues.TAG;
-import static java.lang.Math.abs;
 
 public class MainActivity extends Activity implements View.OnClickListener {
     private Button changeClassButton, clearButton;
@@ -70,6 +55,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private String[] readText;
     private CanvasBitmap canvasBitmap;
     private TextView imageNumTv;
+    
+    private int pointerID1, pointerID2;
+    //private int[] newX, newY, oldX, oldY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,51 +128,79 @@ public class MainActivity extends Activity implements View.OnClickListener {
         int eventAction = event.getActionMasked();
         int pointerIndex = event.getActionIndex();
         int pointerID = event.getPointerId(pointerIndex);
-
+        
 
         switch (eventAction) {
             case MotionEvent.ACTION_DOWN:
-                pointerIDs[0] = pointerID;
-                pointerIDs[1] = -1;
-                ptrIndex = event.findPointerIndex(pointerIDs[0]);
-
+                pointerID1 = pointerID;
+                pointerID2 = -1;
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
-                if (pointerIDs[1] == -1) {
-                    pointerIDs[1] = pointerID;
-                } else if (pointerIDs[0] >= 0) {
-                    pointerIDs[0] = pointerID;
+
+                if (pointerID2 == -1) {
+                    pointerID2 = pointerID;
+                } else if (pointerID1 == -1) {
+                    pointerID1 = pointerID;
+                }
+                if (pointerID1 >= 0) {
+                    ptrIndex = event.findPointerIndex(pointerID1);
+                    newXY1[0] = (int) event.getX(ptrIndex);
+                    newXY1[1] = (int) event.getY(ptrIndex);
+                }
+                if (pointerID2 >= 0) {
+                    ptrIndex = event.findPointerIndex(pointerID2);
+                    newXY2[0] = (int) event.getX(ptrIndex);
+                    newXY2[1] = (int) event.getY(ptrIndex);
                 }
 
-                if (pointerIDs[0] >= 0) {
-                    ptrIndex = event.findPointerIndex(pointerIDs[0]);
-                }
-                if (pointerIDs[1] >= 0) {
-                    ptrIndex = event.findPointerIndex(pointerIDs[1]);
-                }
                 break;
             case MotionEvent.ACTION_POINTER_UP:
-
-                if (pointerIDs[0] == pointerID) {
-                    pointerIDs[0] = -1;
-                } else if (pointerIDs[1] == pointerID) {
-                    pointerIDs[1] = -1;
+                byTwoFingerFirst = true;
+                if (pointerID1 == pointerID) {
+                    pointerID1 = -1;
+                } else if (pointerID2 == pointerID) {
+                    pointerID2 = -1;
                 }
                 break;
+            case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP:
-                pointerIDs[0] = -1;
-                pointerIDs[1] = -1;
+                byTwoFingerFirst = true;
+                pointerID1 = -1;
+                pointerID2 = -1;
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (pointerIDs[0] >= 0) {
-                    ptrIndex = event.findPointerIndex(pointerIDs[0]);
+                if (pointerID1 >= 0) {
+                    ptrIndex = event.findPointerIndex(pointerID1);
+                    newXY1[0] = (int) event.getX(ptrIndex);
+                    newXY1[1] = (int) event.getY(ptrIndex);
+                }
+                if (pointerID2 >= 0) {
+                    ptrIndex = event.findPointerIndex(pointerID2);
+
+                    newXY2[0] = (int) event.getX(ptrIndex);
+                    newXY2[1] = (int) event.getY(ptrIndex);
+                }
+                if (pointerID1 >= 0 && pointerID2 >= 0 && !byTwoFingerFirst) {
+
+                    startPoint[0] += ((newXY1[0] + newXY2[0]) - (oldXY1[0] + oldXY2[0])) / 2;
+                    startPoint[1] += ((newXY1[1] + newXY2[1]) - (oldXY1[1] + oldXY2[1])) / 2;
+
+                    canvasBitmap.drawCrossHair(imageNumber, startPoint, Color.GREEN, 0);
+
+
 
                 }
-                if (pointerIDs[1] >= 0) {
-                    ptrIndex = event.findPointerIndex(pointerIDs[1]);
-
+                if (pointerID1 >= 0) {
+                    ptrIndex = event.findPointerIndex(pointerID1);
+                    oldXY1[0] = (int) event.getX(ptrIndex);
+                    oldXY1[1] = (int) event.getY(ptrIndex);
                 }
-
+                if (pointerID2 >= 0) {
+                    ptrIndex = event.findPointerIndex(pointerID2);
+                    oldXY2[0] = (int) event.getX(ptrIndex);
+                    oldXY2[1] = (int) event.getY(ptrIndex);
+                }
+                byTwoFingerFirst = false;
                 break;
         }
 
@@ -216,6 +232,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
 
             tmpFiles = new File(imagesDir.getPath()).listFiles();
+
             if (tmpFiles.length != 0) {
                 imageCount = 0;
                 for (int i = 0; i < tmpFiles.length; i++) {
@@ -240,6 +257,17 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 }
                 editor.putInt("ImageCount", images.length);
                 editor.commit();
+                if (tmpFiles.length != 0)
+                    canvasBitmap = new CanvasBitmap(images, imageView, this);
+            } else {
+                Toast.makeText(this, "NOT FOUND IMAGE DATA !!", Toast.LENGTH_SHORT).show();
+                editor.putInt("ImageCount", 0);
+                editor.putInt("ImageNumber", 0);
+                editor.commit();
+                imageCount = 0;
+                imageNumber = 0;
+                imageNumTv.setText(0 + " / " + 0);
+                imageView.setImageResource(R.drawable.no_images);
             }
         } else {
             Toast.makeText(this, "NOT FOUND IMAGE DATA !!", Toast.LENGTH_SHORT).show();
@@ -248,7 +276,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             editor.commit();
             imageCount = 0;
             imageNumber = 0;
-            imageNumTv.setText(0+ " / " + 0);
+            imageNumTv.setText(0 + " / " + 0);
             imageView.setImageResource(R.drawable.no_images);
         }
     }
@@ -257,13 +285,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onStart() {
         super.onStart();
-        importImagesFromSD();
+
 
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        importImagesFromSD();
         getDataFromSP();
         classNameChange();
         setImageNumToTv();
