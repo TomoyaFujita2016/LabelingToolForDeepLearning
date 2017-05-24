@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -43,8 +44,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private int[] startPoint;
     private int[] pointerIDs;
     private int ptrIndex;
-    private boolean byTwoFingerFirst = true;
-    private boolean bySingleFingerMove = false;
+    private boolean byFirstTouch = true;
     private int[] rectStartXY;
     private File[] images;
     private int[] rectEndXY;
@@ -55,7 +55,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private String[] readText;
     private CanvasBitmap canvasBitmap;
     private TextView imageNumTv;
-    
+    private ToggleButton toggleButton;
+
     private int pointerID1, pointerID2;
     //private int[] newX, newY, oldX, oldY;
 
@@ -91,6 +92,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         backButton = (ImageButton) findViewById(R.id.backBtn);
         imageView = (ImageView) findViewById(R.id.iv);
         listLinearLayout = (LinearLayout) findViewById(R.id.displayLL);
+        toggleButton = (ToggleButton) findViewById(R.id.toggleButton);
         changeClassButton.setOnClickListener(this);
         clearButton.setOnClickListener(this);
         configButton.setOnClickListener(this);
@@ -125,83 +127,38 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {    //TODO change the way moving crossHair.
-        int eventAction = event.getActionMasked();
-        int pointerIndex = event.getActionIndex();
-        int pointerID = event.getPointerId(pointerIndex);
-        
+        Log.i("TOGGLE", toggleButton.isChecked() + "");
 
-        switch (eventAction) {
-            case MotionEvent.ACTION_DOWN:
-                pointerID1 = pointerID;
-                pointerID2 = -1;
-                break;
-            case MotionEvent.ACTION_POINTER_DOWN:
+        if (toggleButton.isChecked()) {
+            newXY1[0] = (int) event.getX();
+            newXY1[1] = (int) event.getY();
+            canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1, Color.RED, 0, false);
 
-                if (pointerID2 == -1) {
-                    pointerID2 = pointerID;
-                } else if (pointerID1 == -1) {
-                    pointerID1 = pointerID;
-                }
-                if (pointerID1 >= 0) {
-                    ptrIndex = event.findPointerIndex(pointerID1);
-                    newXY1[0] = (int) event.getX(ptrIndex);
-                    newXY1[1] = (int) event.getY(ptrIndex);
-                }
-                if (pointerID2 >= 0) {
-                    ptrIndex = event.findPointerIndex(pointerID2);
-                    newXY2[0] = (int) event.getX(ptrIndex);
-                    newXY2[1] = (int) event.getY(ptrIndex);
-                }
+            if (event.getActionMasked() == MotionEvent.ACTION_UP){
+                canvasBitmap.drawRectangle(imageNumber, startPoint, oldXY1, Color.RED, 0, true);
+                toggleButton.setChecked(false);
+                byFirstTouch = true;
+            }
+            oldXY1 = newXY1;
+        }
 
-                break;
-            case MotionEvent.ACTION_POINTER_UP:
-                byTwoFingerFirst = true;
-                if (pointerID1 == pointerID) {
-                    pointerID1 = -1;
-                } else if (pointerID2 == pointerID) {
-                    pointerID2 = -1;
-                }
-                break;
-            case MotionEvent.ACTION_CANCEL:
-            case MotionEvent.ACTION_UP:
-                byTwoFingerFirst = true;
-                pointerID1 = -1;
-                pointerID2 = -1;
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if (pointerID1 >= 0) {
-                    ptrIndex = event.findPointerIndex(pointerID1);
-                    newXY1[0] = (int) event.getX(ptrIndex);
-                    newXY1[1] = (int) event.getY(ptrIndex);
-                }
-                if (pointerID2 >= 0) {
-                    ptrIndex = event.findPointerIndex(pointerID2);
+        if (!toggleButton.isChecked()) {
+            newXY1[0] = (int) event.getX();
+            newXY1[1] = (int) event.getY();
+            if (!byFirstTouch) {
+                startPoint[0] += (newXY1[0] - oldXY1[0]) / 2;
+                startPoint[1] += (newXY1[1] - oldXY1[1]) / 2;
+                canvasBitmap.drawCrossHair(imageNumber, startPoint, Color.WHITE, 0);
+            }
+            oldXY1[0] = (int) event.getX();
+            oldXY1[1] = (int) event.getY();
 
-                    newXY2[0] = (int) event.getX(ptrIndex);
-                    newXY2[1] = (int) event.getY(ptrIndex);
-                }
-                if (pointerID1 >= 0 && pointerID2 >= 0 && !byTwoFingerFirst) {
-
-                    startPoint[0] += ((newXY1[0] + newXY2[0]) - (oldXY1[0] + oldXY2[0])) / 2;
-                    startPoint[1] += ((newXY1[1] + newXY2[1]) - (oldXY1[1] + oldXY2[1])) / 2;
-
-                    canvasBitmap.drawCrossHair(imageNumber, startPoint, Color.GREEN, 0);
-
-
-
-                }
-                if (pointerID1 >= 0) {
-                    ptrIndex = event.findPointerIndex(pointerID1);
-                    oldXY1[0] = (int) event.getX(ptrIndex);
-                    oldXY1[1] = (int) event.getY(ptrIndex);
-                }
-                if (pointerID2 >= 0) {
-                    ptrIndex = event.findPointerIndex(pointerID2);
-                    oldXY2[0] = (int) event.getX(ptrIndex);
-                    oldXY2[1] = (int) event.getY(ptrIndex);
-                }
-                byTwoFingerFirst = false;
-                break;
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                byFirstTouch = false;
+            }
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                byFirstTouch = true;
+            }
         }
 
         return true;

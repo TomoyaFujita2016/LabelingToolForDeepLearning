@@ -1,6 +1,7 @@
 package com.tomoya.yololabelingtool;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -15,7 +16,7 @@ import java.io.File;
  * Created by Tomoya on 2017/05/19.
  */
 
-public class CanvasBitmap {
+public class CanvasBitmap{
 
     private Bitmap bitmap, tmpBitmap;
     private ImageView imageView;
@@ -24,6 +25,9 @@ public class CanvasBitmap {
     private Paint paintCrossHair, paintRect;
     private File[] images;
     private BitmapFactory.Options options;
+    private int saveImageNumber;
+    private SharedPreferences saveNumber;
+    private SharedPreferences.Editor editor;
 
     public int[] crossHairXY;
     public int[] rectStartXY, rectEndXY;
@@ -43,7 +47,6 @@ public class CanvasBitmap {
 
         //canvas = new Canvas(bitmap);
         //canvas.drawBitmap(bitmap, 0, 0, null);
-
 
 
         paintCrossHair = new Paint();
@@ -87,10 +90,13 @@ public class CanvasBitmap {
         return XY;
     }
 
-    private void fileToBitmap(int imageNumber){
-        bitmap = BitmapFactory.decodeFile(images[imageNumber].getPath(),options);
-        tmpBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
-        canvas = new Canvas(bitmap);
+    private void fileToBitmap(int imageNumber) {
+        if (saveImageNumber != imageNumber || imageNumber == 0) {
+            bitmap = BitmapFactory.decodeFile(images[imageNumber].getPath(), options);
+            tmpBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+            canvas = new Canvas(bitmap);
+        }
+        saveImageNumber = imageNumber;
     }
 
     public void drawCrossHair(int imageNumber, int[] XY, int color, int thickness) {
@@ -105,17 +111,19 @@ public class CanvasBitmap {
         canvas.drawBitmap(tmpBitmap, 0, 0, null);
         canvas.drawLine(0, XY[1], bitmap.getWidth(), XY[1], paintCrossHair);
         canvas.drawLine(XY[0], 0, XY[0], bitmap.getHeight(), paintCrossHair);
-        imageView.setImageBitmap(bitmap);
+       imageView.setImageBitmap(bitmap);
 
 
     }
 
-    public void drawRectangle(int imageNumber, int[] startXY, int[] endXY, int color, int thickness) {
+    public void drawRectangle(int imageNumber, int[] startXY, int[] endXY, int color, int thickness, boolean bySave) {
         fileToBitmap(imageNumber);
 
         startXY = ToInner(startXY);
         rectStartXY[0] = startXY[0];
         rectStartXY[1] = startXY[1];
+
+        endXY = GLtoLC(endXY);
         endXY = ToInner(endXY);
         rectEndXY[0] = endXY[0];
         rectEndXY[1] = endXY[1];
@@ -124,7 +132,8 @@ public class CanvasBitmap {
         paintRect.setStrokeWidth(thickness);
         paintRect.setColor(color);
 
-        canvas.drawBitmap(tmpBitmap, 0, 0, null);
+       //if (!bySave)
+            canvas.drawBitmap(tmpBitmap, 0, 0, null);
         canvas.drawLine(startXY[0], startXY[1], startXY[0], endXY[1], paintRect);    // (|  )
         canvas.drawLine(startXY[0], startXY[1], endXY[0], startXY[1], paintRect);    //(upper side ---)
         canvas.drawLine(startXY[0], endXY[1], endXY[0], endXY[1], paintRect);        //(lower side ---)

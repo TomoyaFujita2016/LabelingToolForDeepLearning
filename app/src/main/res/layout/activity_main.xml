@@ -26,20 +26,21 @@
 
                 <ImageButton
                     android:id="@+id/configBtn"
-                    android:layout_weight="1"
                     android:layout_width="0dp"
                     android:layout_height="50dp"
+                    android:layout_weight="1"
                     android:adjustViewBounds="true"
                     android:scaleType="fitCenter"
                     android:src="@drawable/option_icon" />
+
                 <ImageButton
                     android:id="@+id/loadBtn"
-                    android:src="@drawable/load"
-                    android:scaleType="fitCenter"
-                    android:adjustViewBounds="true"
-                    android:layout_weight="1"
                     android:layout_width="0dp"
-                    android:layout_height="50dp" />
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/load" />
             </LinearLayout>
 
             <Button
@@ -86,14 +87,31 @@
                 android:textColor="#000000"
                 android:textSize="10dp" />
 
-            <Button
-                android:id="@+id/changeClassbtn"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_marginTop="2dp"
-                android:text="ChangeClass"
-                android:textSize="12dp" />
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/changeClassbtn"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginTop="2dp"
+                    android:text="ChangeClass"
+                    android:textSize="8dp" />
+
+                <ToggleButton
+                    android:id="@+id/toggleButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginTop="2dp"
+                    android:layout_weight="1"
+                    android:textOff="Cross"
+                    android:textOn="Rect"/>
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
