@@ -12,6 +12,8 @@ import android.widget.ImageView;
 
 import java.io.File;
 
+import javax.microedition.khronos.opengles.GL;
+
 /**
  * Created by Tomoya on 2017/05/19.
  */
@@ -29,7 +31,7 @@ public class CanvasBitmap {
     private SharedPreferences saveNumber;
     private SharedPreferences.Editor editor;
 
-    public int[] imageRatio;
+    public float[] imageRatio;
     public int[] crossHairXY;
     public int[] rectStartXY, rectEndXY;
 
@@ -40,7 +42,7 @@ public class CanvasBitmap {
         this.imageView = imageView;
         this.activity = activity;
 
-        imageRatio = new int[2];
+        imageRatio = new float[2];
         options = new BitmapFactory.Options();
         options.inMutable = true;
         crossHairXY = new int[2];
@@ -69,8 +71,8 @@ public class CanvasBitmap {
 
         XY[0] -= rectView.left;
         XY[1] -= rectView.top;
-        XY[0] = XY[0] * bitmap.getWidth() / imageView.getWidth();
-        XY[1] = XY[1] * bitmap.getHeight() / imageView.getHeight();
+        XY[0] = Math.round(XY[0] * imageRatio[0]);
+        XY[1] = Math.round(XY[1] * imageRatio[1]);
 
         return XY;
     }
@@ -97,15 +99,22 @@ public class CanvasBitmap {
             bitmap = BitmapFactory.decodeFile(images[imageNumber].getPath(), options);
             tmpBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
             canvas = new Canvas(bitmap);
-            makeRatio();
+
 
         }
         saveImageNumber = imageNumber;
+        makeRatio();
     }
 
     private void makeRatio() {
-        imageRatio[0] = Math.round(bitmap.getWidth() / imageView.getWidth());
-        imageRatio[1] = Math.round(bitmap.getHeight() / imageView.getHeight());
+
+        float a = bitmap.getWidth();
+        float b = imageView.getWidth();
+        imageRatio[0] = a / b;
+
+        a = bitmap.getHeight();
+        b = imageView.getHeight();
+        imageRatio[1] = a / b;
     }
 
     public void drawCrossHair(int imageNumber, int[] XY, int color, int thickness) {
@@ -137,28 +146,38 @@ public class CanvasBitmap {
     public void drawRectangle(int imageNumber, int[] startXY, int[] endXY, String className, int color, int thickness, boolean bySave) {
         fileToBitmap(imageNumber);
         if (false && bySave) {
-            startXY = changeImageRatio(startXY);
-            endXY = changeImageRatio(endXY);
+
         }
-        startXY = ToInner(startXY);
-        rectStartXY[0] = startXY[0];
-        rectStartXY[1] = startXY[1];
 
-        endXY = GLtoLC(endXY);
-        endXY = ToInner(endXY);
-        rectEndXY[0] = endXY[0];
-        rectEndXY[1] = endXY[1];
+        if (!bySave) {
+            //startXY = GLtoLC(startXY);
+            startXY = ToInner(startXY);
+            rectStartXY[0] = startXY[0];
+            rectStartXY[1] = startXY[1];
 
-        paintRect.setColor(color);
-        paintRect.setStrokeWidth(thickness);
-        paintRect.setColor(color);
+            endXY = GLtoLC(endXY);
+            endXY = ToInner(endXY);
+            rectEndXY[0] = endXY[0];
+            rectEndXY[1] = endXY[1];
+
+            paintRect.setColor(color);
+            paintRect.setStrokeWidth(thickness);
+            paintRect.setColor(color);
 
 
-        canvas.drawBitmap(tmpBitmap, 0, 0, null);
-        canvas.drawText(className, startXY[0], startXY[1], paintRect);
-        Log.d("CANVAS", endXY[0] + " " + endXY[1]);
-        canvas.drawRect(startXY[0], startXY[1], endXY[0], endXY[1], paintRect);
-
+            canvas.drawBitmap(tmpBitmap, 0, 0, null);
+            canvas.drawText(className, startXY[0], startXY[1], paintRect);
+            Log.d("CANVAS", endXY[0] + " " + endXY[1]);
+            canvas.drawRect(startXY[0], startXY[1], endXY[0], endXY[1], paintRect);
+        }else {
+            paintRect.setColor(color);
+            paintRect.setStrokeWidth(thickness);
+            paintRect.setColor(color);
+            canvas.drawBitmap(tmpBitmap, 0, 0, null);
+            canvas.drawText(className, startXY[0], startXY[1], paintRect);
+            Log.d("CANVAS", endXY[0] + " " + endXY[1]);
+            canvas.drawRect(startXY[0], startXY[1], endXY[0], endXY[1], paintRect);
+        }
 
         imageView.setImageBitmap(bitmap);
 

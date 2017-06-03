@@ -133,19 +133,17 @@ public class MainActivity extends Activity implements View.OnClickListener {
             newXY1[0] = (int) event.getX();
             newXY1[1] = (int) event.getY();
             canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1,classNames[classNumber],  Color.RED, 0, false);
-
             Log.d("NORMAL", startPoint[0] +"  "+ startPoint[1] + "  " + newXY1[0] + "  " + newXY1[1]);
 
             if (event.getActionMasked() == MotionEvent.ACTION_UP){
-
                 Log.d("ACTION_UP", startPoint[0] +"  "+ startPoint[1] + "  " + newXY1[0] + "  " + newXY1[1]);
-
-                canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1, classNames[classNumber], Color.RED, 0, false);
+                canvasBitmap.drawRectangle(imageNumber, startPoint, oldXY1, classNames[classNumber], Color.RED, 0, true);
                 toggleButton.setChecked(false);
                 byFirstTouch = true;
             }
-            oldXY1[0] = newXY1[0];
-            oldXY1[1] = newXY1[0];
+
+            oldXY1[0] = canvasBitmap.rectEndXY[0];
+            oldXY1[1] = canvasBitmap.rectEndXY[1];
         }
 
         if (!toggleButton.isChecked()) {
@@ -156,8 +154,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 startPoint[1] += (newXY1[1] - oldXY1[1]) / 2;
                 canvasBitmap.drawCrossHair(imageNumber, startPoint, Color.WHITE, 0);
 
-                canvasBitmap.crossHairXY[0] = startPoint[0];
-                canvasBitmap.crossHairXY[1] = startPoint[1];
              }
             oldXY1[0] = (int) event.getX();
             oldXY1[1] = (int) event.getY();
