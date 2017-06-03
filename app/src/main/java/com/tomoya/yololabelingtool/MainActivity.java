@@ -127,19 +127,25 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {    //TODO change the way moving crossHair.
-        Log.i("TOGGLE", toggleButton.isChecked() + "");
+        //Log.i("TOGGLE", toggleButton.isChecked() + "");
 
         if (toggleButton.isChecked()) {
             newXY1[0] = (int) event.getX();
             newXY1[1] = (int) event.getY();
-            canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1, Color.RED, 0, false);
+            canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1,classNames[classNumber],  Color.RED, 0, false);
+
+            Log.d("NORMAL", startPoint[0] +"  "+ startPoint[1] + "  " + newXY1[0] + "  " + newXY1[1]);
 
             if (event.getActionMasked() == MotionEvent.ACTION_UP){
-                canvasBitmap.drawRectangle(imageNumber, startPoint, oldXY1, Color.RED, 0, true);
+
+                Log.d("ACTION_UP", startPoint[0] +"  "+ startPoint[1] + "  " + newXY1[0] + "  " + newXY1[1]);
+
+                canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1, classNames[classNumber], Color.RED, 0, false);
                 toggleButton.setChecked(false);
                 byFirstTouch = true;
             }
-            oldXY1 = newXY1;
+            oldXY1[0] = newXY1[0];
+            oldXY1[1] = newXY1[0];
         }
 
         if (!toggleButton.isChecked()) {
@@ -149,7 +155,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 startPoint[0] += (newXY1[0] - oldXY1[0]) / 2;
                 startPoint[1] += (newXY1[1] - oldXY1[1]) / 2;
                 canvasBitmap.drawCrossHair(imageNumber, startPoint, Color.WHITE, 0);
-            }
+
+                canvasBitmap.crossHairXY[0] = startPoint[0];
+                canvasBitmap.crossHairXY[1] = startPoint[1];
+             }
             oldXY1[0] = (int) event.getX();
             oldXY1[1] = (int) event.getY();
 
@@ -160,7 +169,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 byFirstTouch = true;
             }
         }
-
         return true;
     }
 
