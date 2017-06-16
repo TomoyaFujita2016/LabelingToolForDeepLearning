@@ -45,6 +45,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private int[] pointerIDs;
     private int ptrIndex;
     private boolean byFirstTouch = true;
+    private boolean byExistImage = false;
     private int[] rectStartXY;
     private File[] images;
     private int[] rectEndXY;
@@ -56,6 +57,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private CanvasBitmap canvasBitmap;
     private TextView imageNumTv;
     private ToggleButton toggleButton;
+    private Toast shortToast;
 
     private int pointerID1, pointerID2;
     //private int[] newX, newY, oldX, oldY;
@@ -84,6 +86,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         colors[3] = 0x00FFFF00;
         colors[4] = 0x0000FFFF;
 
+        shortToast = Toast.makeText(this, "This Toast has No Text.", Toast.LENGTH_SHORT);
         loadButton = (ImageButton) findViewById(R.id.loadBtn);
         changeClassButton = (Button) findViewById(R.id.changeClassbtn);
         clearButton = (Button) findViewById(R.id.clearBtn);
@@ -128,41 +131,42 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     public boolean onTouchEvent(MotionEvent event) {    //TODO change the way moving crossHair.
         //Log.i("TOGGLE", toggleButton.isChecked() + "");
+        if (byExistImage) {
+            if (toggleButton.isChecked()) {
+                newXY1[0] = (int) event.getX();
+                newXY1[1] = (int) event.getY();
+                canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1, classNames[classNumber], Color.RED, 0, false);
+                Log.d("NORMAL", startPoint[0] + "  " + startPoint[1] + "  " + newXY1[0] + "  " + newXY1[1]);
 
-        if (toggleButton.isChecked()) {
-            newXY1[0] = (int) event.getX();
-            newXY1[1] = (int) event.getY();
-            canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1,classNames[classNumber],  Color.RED, 0, false);
-            Log.d("NORMAL", startPoint[0] +"  "+ startPoint[1] + "  " + newXY1[0] + "  " + newXY1[1]);
+                if (event.getActionMasked() == MotionEvent.ACTION_UP) {
+                    Log.d("ACTION_UP", startPoint[0] + "  " + startPoint[1] + "  " + newXY1[0] + "  " + newXY1[1]);
+                    canvasBitmap.drawRectangle(imageNumber, startPoint, oldXY1, classNames[classNumber], Color.RED, 0, true);
+                    toggleButton.setChecked(false);
+                    byFirstTouch = true;
+                }
 
-            if (event.getActionMasked() == MotionEvent.ACTION_UP){
-                Log.d("ACTION_UP", startPoint[0] +"  "+ startPoint[1] + "  " + newXY1[0] + "  " + newXY1[1]);
-                canvasBitmap.drawRectangle(imageNumber, startPoint, oldXY1, classNames[classNumber], Color.RED, 0, true);
-                toggleButton.setChecked(false);
-                byFirstTouch = true;
+                oldXY1[0] = canvasBitmap.rectEndXY[0];
+                oldXY1[1] = canvasBitmap.rectEndXY[1];
             }
 
-            oldXY1[0] = canvasBitmap.rectEndXY[0];
-            oldXY1[1] = canvasBitmap.rectEndXY[1];
-        }
+            if (!toggleButton.isChecked()) {
+                newXY1[0] = (int) event.getX();
+                newXY1[1] = (int) event.getY();
+                if (!byFirstTouch) {
+                    startPoint[0] += (newXY1[0] - oldXY1[0]) / 2;
+                    startPoint[1] += (newXY1[1] - oldXY1[1]) / 2;
+                    canvasBitmap.drawCrossHair(imageNumber, startPoint, Color.WHITE, 0);
 
-        if (!toggleButton.isChecked()) {
-            newXY1[0] = (int) event.getX();
-            newXY1[1] = (int) event.getY();
-            if (!byFirstTouch) {
-                startPoint[0] += (newXY1[0] - oldXY1[0]) / 2;
-                startPoint[1] += (newXY1[1] - oldXY1[1]) / 2;
-                canvasBitmap.drawCrossHair(imageNumber, startPoint, Color.WHITE, 0);
+                }
+                oldXY1[0] = (int) event.getX();
+                oldXY1[1] = (int) event.getY();
 
-             }
-            oldXY1[0] = (int) event.getX();
-            oldXY1[1] = (int) event.getY();
-
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                byFirstTouch = false;
-            }
-            if (event.getAction() == MotionEvent.ACTION_UP) {
-                byFirstTouch = true;
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    byFirstTouch = false;
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    byFirstTouch = true;
+                }
             }
         }
         return true;
@@ -171,8 +175,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private void classNameChange() {
         if (classCount != 0)
             classNameText.setText("Class" + classNumber + ": " + classNames[classNumber]);
-        else
-            Toast.makeText(this, "PLEASE MAKE A CLASS NAME !", Toast.LENGTH_SHORT).show();
+        else {
+            cancelShowToast("PLEASE MAKE A CLASS NAME !");
+        }
     }
 
     private void addViewToLL(String string) {
@@ -181,7 +186,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         listLinearLayout.addView(textView);
     }
 
-    private void importImagesFromSD() {
+    private boolean importImagesFromSD() {
         File[] extDirs = getExternalFilesDirs(Environment.DIRECTORY_PICTURES);
         if (extDirs.length != 1) {
 
@@ -218,10 +223,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 }
                 editor.putInt("ImageCount", images.length);
                 editor.commit();
+
                 if (tmpFiles.length != 0)
                     canvasBitmap = new CanvasBitmap(images, imageView, this);
+
+                return true;
             } else {
-                Toast.makeText(this, "NOT FOUND IMAGE DATA !!", Toast.LENGTH_SHORT).show();
+
+                cancelShowToast("NOT FOUND IMAGE DATA !!");
                 editor.putInt("ImageCount", 0);
                 editor.putInt("ImageNumber", 0);
                 editor.commit();
@@ -229,9 +238,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 imageNumber = 0;
                 imageNumTv.setText(0 + " / " + 0);
                 imageView.setImageResource(R.drawable.no_images);
+                return false;
             }
         } else {
-            Toast.makeText(this, "NOT FOUND IMAGE DATA !!", Toast.LENGTH_SHORT).show();
+            cancelShowToast("NOT FOUND IMAGE DATA !!");
             editor.putInt("ImageCount", 0);
             editor.putInt("ImageNumber", 0);
             editor.commit();
@@ -239,6 +249,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             imageNumber = 0;
             imageNumTv.setText(0 + " / " + 0);
             imageView.setImageResource(R.drawable.no_images);
+            return false;
         }
     }
 
@@ -253,13 +264,21 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onResume() {
         super.onResume();
-        importImagesFromSD();
+
+        byExistImage = importImagesFromSD();
         getDataFromSP();
         classNameChange();
         setImageNumToTv();
         displayImage(imageNumber);
 
 
+    }
+
+    private void cancelShowToast(String text) {
+        //if (shortToast != null)
+        //shortToast.cancel();
+        shortToast.setText(text);
+        shortToast.show();
     }
 
     @Override
@@ -339,7 +358,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             editor.putInt("ImageNumber", imageNumber);
             editor.commit();
             setImageNumToTv();
-        } else Toast.makeText(this, "UPPER LIMIT !", Toast.LENGTH_SHORT).show();
+        } else cancelShowToast("UPPER LIMIT !");
 
         displayImage(imageNumber);
     }
@@ -351,14 +370,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
             editor.putInt("ImageNumber", imageNumber);
             editor.commit();
             setImageNumToTv();
-        } else Toast.makeText(this, "LOWER LIMIT !", Toast.LENGTH_SHORT).show();
+        } cancelShowToast("LOWER LIMIT !");
 
         displayImage(imageNumber);
     }
 
     private void onLoadBtn() {
         Log.d(TAG, "Clicked onLoadButton");
-        importImagesFromSD();
+        byExistImage = importImagesFromSD();
         initialization();
         setImageNumToTv();
         displayImage(imageNumber);
