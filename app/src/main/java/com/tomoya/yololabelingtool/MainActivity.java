@@ -37,6 +37,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private String[] classNames;
     private int classNumber;
     private TextView classNameText;
+    private TextView imageNameTv;
+    private TextView imageSizeTv;
     private int imageNumber;
     private File tmp;
     private Bitmap bitmap;
@@ -98,6 +100,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         imageView = (ImageView) findViewById(R.id.iv);
         listLinearLayout = (LinearLayout) findViewById(R.id.displayLL);
         toggleButton = (ToggleButton) findViewById(R.id.toggleButton);
+        imageNameTv = (TextView) findViewById(R.id.displayImageName);
+        imageSizeTv = (TextView) findViewById(R.id.displayImageSize);
         changeClassButton.setOnClickListener(this);
         clearButton.setOnClickListener(this);
         configButton.setOnClickListener(this);
@@ -131,14 +135,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event) {    //TODO change the way moving crossHair.
+    public boolean onTouchEvent(MotionEvent event) {
         //Log.i("TOGGLE", toggleButton.isChecked() + "");
         if (byExistImage) {
             if (toggleButton.isChecked()) {
                 newXY1[0] = (int) event.getX();
                 newXY1[1] = (int) event.getY();
                 Log.d("NORMAL", startPoint[0] + "  " + startPoint[1] + "  " + newXY1[0] + "  " + newXY1[1]);
-                //TODO classNames was accessed wrong index
                 if (classCount != 0)
                     canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1, classNames[classNumber], Color.RED, 0, false);
                 if (classCount == 0)
@@ -146,7 +149,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
                 if (event.getActionMasked() == MotionEvent.ACTION_UP) {
                     Log.d("ACTION_UP", startPoint[0] + "  " + startPoint[1] + "  " + newXY1[0] + "  " + newXY1[1]);
-                    canvasBitmap.drawRectangle(imageNumber, startPoint, oldXY1, classNames[classNumber], Color.RED, 0, true);
+
+                    if (classCount != 0)
+                        canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1, classNames[classNumber], Color.RED, 0, true);
+                    if (classCount == 0)
+                        canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1, "NULL", Color.RED, 0, true);
+
                     toggleButton.setChecked(false);
                     byFirstTouch = true;
                 }
@@ -274,21 +282,19 @@ public class MainActivity extends Activity implements View.OnClickListener {
         byExistImage = importImagesFromSD();
         getDataFromSP();
         classNameChange();
-        setImageNumToTv();
+        displayImageData();
         displayImage(imageNumber);
 
 
     }
 
     private void cancelShowToast(String text) {
-        //if (shortToast != null)
-        //shortToast.cancel();
         shortToast.setText(text);
         shortToast.show();
     }
+
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
-        //fileFromDrawable("no_images");
     }
 
     private void displayImage(int imgNumber) {
@@ -307,18 +313,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
     }
 
-    private void setImageNumToTv() {
-        if (imageCount != 0)
+    private void displayImageData() {
+        if (imageCount != 0) {
             imageNumTv.setText(imageNumber + 1 + " / " + imageCount);
+            imageNameTv.setText(images[imageNumber].getName());
+            imageSizeTv.setText(canvasBitmap.imageSizeW[imageNumber] + " × " + canvasBitmap.imageSizeH[imageNumber]);
+        }
     }
 
-    private void fileFromDrawable(String filename){
-
-        File[] fileDrawable = new File[1];
-        fileDrawable[0] = new File("/res/drawable/"+filename);
-        canvasBitmap = new CanvasBitmap(fileDrawable, imageView, this);
-
-    }
 
     @Override
     public void onClick(View view) {
@@ -370,10 +372,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
             imageNumber++;
             editor.putInt("ImageNumber", imageNumber);
             editor.commit();
-            setImageNumToTv();
+            displayImageData();
+            displayImage(imageNumber);
         } else cancelShowToast("UPPER LIMIT !");
 
-        displayImage(imageNumber);
+
     }
 
     private void onBackBtn() {
@@ -382,17 +385,19 @@ public class MainActivity extends Activity implements View.OnClickListener {
             imageNumber--;
             editor.putInt("ImageNumber", imageNumber);
             editor.commit();
-            setImageNumToTv();
-        } cancelShowToast("LOWER LIMIT !");
+            displayImageData();
+            displayImage(imageNumber);
+        }
+        cancelShowToast("LOWER LIMIT !");
 
-        displayImage(imageNumber);
+
     }
 
     private void onLoadBtn() {
         Log.d(TAG, "Clicked onLoadButton");
         byExistImage = importImagesFromSD();
         initialization();
-        setImageNumToTv();
+        displayImageData();
         displayImage(imageNumber);
     }
 }

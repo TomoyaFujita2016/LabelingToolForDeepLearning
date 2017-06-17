@@ -16,8 +16,7 @@
             android:layout_height="match_parent"
             android:layout_margin="5dp"
             android:background="#BDBDBD"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -82,8 +81,37 @@
                 android:id="@+id/displayImageNum"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="1dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:background="#D8D8D8"
                 android:gravity="center"
                 android:text="0/0"
+                android:textColor="#000000"
+                android:textSize="10dp" />
+
+            <TextView
+                android:id="@+id/displayImageName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="1dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:background="#D8D8D8"
+                android:gravity="center"
+                android:text="no_images"
+                android:textColor="#000000"
+                android:textSize="10dp" />
+
+            <TextView
+                android:id="@+id/displayImageSize"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:background="#D8D8D8"
+                android:gravity="center"
+                android:text="640×480"
                 android:textColor="#000000"
                 android:textSize="10dp" />
 
@@ -95,10 +123,10 @@
                 <Button
                     android:id="@+id/changeClassbtn"
                     android:layout_width="0dp"
-                    android:layout_weight="1"
                     android:layout_height="match_parent"
                     android:layout_gravity="bottom"
                     android:layout_marginTop="2dp"
+                    android:layout_weight="1"
                     android:text="ChangeClass"
                     android:textSize="7dp" />
 
@@ -107,12 +135,12 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_gravity="bottom"
-                    android:layout_marginTop="3dp"
                     android:layout_marginBottom="1dp"
+                    android:layout_marginTop="3dp"
                     android:layout_weight="1"
                     android:textOff="Cross"
-                    android:textSize="10dp"
-                    android:textOn="Rect"/>
+                    android:textOn="Rect"
+                    android:textSize="10dp" />
             </LinearLayout>
 
             <LinearLayout
@@ -150,8 +178,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|center_horizontal"
-            android:adjustViewBounds="true"
             android:layout_margin="4dp"
+            android:adjustViewBounds="true"
 
             android:src="@drawable/no_images" />
 

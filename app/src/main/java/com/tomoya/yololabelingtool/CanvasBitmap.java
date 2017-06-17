@@ -34,6 +34,7 @@ public class CanvasBitmap {
     public float[] imageRatio;
     public int[] crossHairXY;
     public int[] rectStartXY, rectEndXY;
+    public int[] imageSizeH, imageSizeW;
 
     CanvasBitmap(File[] images, ImageView imageView, Activity activity) {
         Log.d("Constructor", "Loaded Constructor");
@@ -48,6 +49,8 @@ public class CanvasBitmap {
         crossHairXY = new int[2];
         rectStartXY = new int[2];
         rectEndXY = new int[2];
+        imageSizeH = new int[images.length];
+        imageSizeW = new int[images.length];
 
         //canvas = new Canvas(bitmap);
         //canvas.drawBitmap(bitmap, 0, 0, null);
@@ -60,7 +63,7 @@ public class CanvasBitmap {
         paintRect = new Paint();
         paintRect.setStyle(Paint.Style.STROKE);
         paintRect.setAntiAlias(true);
-
+        getSize();
 
     }
 
@@ -94,13 +97,20 @@ public class CanvasBitmap {
         return XY;
     }
 
+    private void getSize() {
+        Bitmap bmp;
+        for (int i = 0; i < images.length; i++) {
+            bmp = BitmapFactory.decodeFile(images[i].getPath(), options);
+            imageSizeW[i] = bmp.getWidth();
+            imageSizeH[i] = bmp.getHeight();
+        }
+    }
+
     private void fileToBitmap(int imageNumber) {
         if (saveImageNumber != imageNumber || imageNumber == 0) {
             bitmap = BitmapFactory.decodeFile(images[imageNumber].getPath(), options);
             tmpBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
             canvas = new Canvas(bitmap);
-
-
         }
         saveImageNumber = imageNumber;
         makeRatio();
@@ -168,7 +178,7 @@ public class CanvasBitmap {
             canvas.drawText(className, startXY[0], startXY[1], paintRect);
             Log.d("CANVAS", endXY[0] + " " + endXY[1]);
             canvas.drawRect(startXY[0], startXY[1], endXY[0], endXY[1], paintRect);
-        }else {
+        } else {
             paintRect.setColor(color);
             paintRect.setStrokeWidth(thickness);
             paintRect.setColor(color);
