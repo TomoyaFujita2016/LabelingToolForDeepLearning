@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Environment;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -154,6 +155,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     if (classCount != 0) {
                         annotation = classNumber + " " + canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1, classNames[classNumber], Color.RED, 0, true);
                         Log.i("ANNOTATION", annotation);
+                        addViewToLL(annotation);
 
                     }
                     if (classCount == 0)
@@ -201,6 +203,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private void addViewToLL(String string) {
         TextView textView = new TextView(this);
         textView.setText(string);
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 10);
+        textView.setTextColor(Color.BLACK);
         listLinearLayout.addView(textView);
     }
 
@@ -360,7 +364,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void onClearBtn() {
-
+        listLinearLayout.removeAllViews();
     }
 
     private void onConfigBtn() {

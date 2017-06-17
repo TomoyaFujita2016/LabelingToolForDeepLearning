@@ -66,6 +66,7 @@ public class CanvasBitmap {
         paintRect.setStyle(Paint.Style.STROKE);
         paintRect.setAntiAlias(true);
         getSize();
+        fileToBitmap(0, true);
 
     }
 
@@ -108,8 +109,8 @@ public class CanvasBitmap {
         }
     }
 
-    private void fileToBitmap(int imageNumber) {
-        if (saveImageNumber != imageNumber || imageNumber == 0) {
+    private void fileToBitmap(int imageNumber, boolean by0) {
+        if (saveImageNumber != imageNumber || by0) {
             bitmap = BitmapFactory.decodeFile(images[imageNumber].getPath(), options);
             tmpBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
             canvas = new Canvas(bitmap);
@@ -130,7 +131,7 @@ public class CanvasBitmap {
     }
 
     public void drawCrossHair(int imageNumber, int[] XY, int color, int thickness) {
-        fileToBitmap(imageNumber);
+        fileToBitmap(imageNumber, false);
         //XY = changeImageRatio(XY);
 
         XY = ToInner(XY);
@@ -158,7 +159,7 @@ public class CanvasBitmap {
     }
 
     public String drawRectangle(int imageNumber, int[] startXY, int[] endXY, String className, int color, int thickness, boolean bySave) {
-        fileToBitmap(imageNumber);
+        fileToBitmap(imageNumber, false);
 
         if (!bySave) {
             //startXY = GLtoLC(startXY);
