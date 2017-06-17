@@ -62,6 +62,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private TextView imageNumTv;
     private ToggleButton toggleButton;
     private Toast shortToast;
+    private String annotation;
 
     private int pointerID1, pointerID2;
     //private int[] newX, newY, oldX, oldY;
@@ -150,8 +151,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 if (event.getActionMasked() == MotionEvent.ACTION_UP) {
                     Log.d("ACTION_UP", startPoint[0] + "  " + startPoint[1] + "  " + newXY1[0] + "  " + newXY1[1]);
 
-                    if (classCount != 0)
-                        canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1, classNames[classNumber], Color.RED, 0, true);
+                    if (classCount != 0) {
+                        annotation = classNumber + " " + canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1, classNames[classNumber], Color.RED, 0, true);
+                        Log.i("ANNOTATION", annotation);
+
+                    }
                     if (classCount == 0)
                         canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1, "NULL", Color.RED, 0, true);
 

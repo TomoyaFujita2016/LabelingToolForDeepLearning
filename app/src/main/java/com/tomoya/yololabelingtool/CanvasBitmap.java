@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -30,6 +31,7 @@ public class CanvasBitmap {
     private int saveImageNumber;
     private SharedPreferences saveNumber;
     private SharedPreferences.Editor editor;
+    private String data;
 
     public float[] imageRatio;
     public int[] crossHairXY;
@@ -135,6 +137,8 @@ public class CanvasBitmap {
         crossHairXY[0] = XY[0];
         crossHairXY[1] = XY[1];
 
+        Log.d("CROSSHAIR", XY[0] + " "+ XY[1]);
+
         paintCrossHair.setColor(color);
         paintCrossHair.setStrokeWidth(thickness);
 
@@ -153,11 +157,8 @@ public class CanvasBitmap {
         return XY;
     }
 
-    public void drawRectangle(int imageNumber, int[] startXY, int[] endXY, String className, int color, int thickness, boolean bySave) {
+    public String drawRectangle(int imageNumber, int[] startXY, int[] endXY, String className, int color, int thickness, boolean bySave) {
         fileToBitmap(imageNumber);
-        if (false && bySave) {
-
-        }
 
         if (!bySave) {
             //startXY = GLtoLC(startXY);
@@ -173,23 +174,42 @@ public class CanvasBitmap {
             paintRect.setStrokeWidth(thickness);
             paintRect.setColor(color);
 
-
             canvas.drawBitmap(tmpBitmap, 0, 0, null);
-            canvas.drawText(className, startXY[0], startXY[1], paintRect);
+
+            if (startXY[1] < 11 || endXY[1] < 11){  //11 is about a letter height
+                canvas.drawText(className, startXY[0] + 1, startXY[1] + 11, paintRect);
+            }else{
+                canvas.drawText(className, startXY[0], startXY[1]-3, paintRect);
+            }
+
             Log.d("CANVAS", endXY[0] + " " + endXY[1]);
             canvas.drawRect(startXY[0], startXY[1], endXY[0], endXY[1], paintRect);
+            imageView.setImageBitmap(bitmap);
+            return null;
         } else {
             paintRect.setColor(color);
             paintRect.setStrokeWidth(thickness);
             paintRect.setColor(color);
             canvas.drawBitmap(tmpBitmap, 0, 0, null);
-            canvas.drawText(className, startXY[0], startXY[1], paintRect);
+
+            if (startXY[1] < 11 || endXY[1] < 11){  //11 is about a height of letters
+                canvas.drawText(className, startXY[0] + 1, startXY[1] + 11, paintRect);
+            }else{
+                canvas.drawText(className, startXY[0], startXY[1]-3, paintRect);
+            }
+            
             Log.d("CANVAS", endXY[0] + " " + endXY[1]);
             canvas.drawRect(startXY[0], startXY[1], endXY[0], endXY[1], paintRect);
+            tmpBitmap = ((BitmapDrawable)imageView.getDrawable()).getBitmap().copy(Bitmap.Config.ARGB_8888, true);
+
+            data = (startXY[0]+endXY[0])/((double)2*bitmap.getWidth()) + " " +
+                    (startXY[1]+endXY[1])/((double)2*bitmap.getHeight()) + " " +
+                    Math.abs((double) endXY[0] - startXY[0])/bitmap.getWidth() + " " +
+                    Math.abs((double) endXY[1] - startXY[1])/bitmap.getHeight();
+            imageView.setImageBitmap(bitmap);
+            return data;
+
         }
-
-        imageView.setImageBitmap(bitmap);
-
     }
 
 
