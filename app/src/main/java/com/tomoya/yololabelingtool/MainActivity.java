@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Environment;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,6 +22,7 @@ import android.widget.ToggleButton;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 
 import static android.content.ContentValues.TAG;
 
@@ -284,10 +286,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         shortToast.setText(text);
         shortToast.show();
     }
-
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
-
+        //fileFromDrawable("no_images");
     }
 
     private void displayImage(int imgNumber) {
@@ -309,6 +310,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private void setImageNumToTv() {
         if (imageCount != 0)
             imageNumTv.setText(imageNumber + 1 + " / " + imageCount);
+    }
+
+    private void fileFromDrawable(String filename){
+
+        File[] fileDrawable = new File[1];
+        fileDrawable[0] = new File("/res/drawable/"+filename);
+        canvasBitmap = new CanvasBitmap(fileDrawable, imageView, this);
+
     }
 
     @Override
