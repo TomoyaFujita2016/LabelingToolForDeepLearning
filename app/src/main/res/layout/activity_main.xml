@@ -12,12 +12,12 @@
         android:orientation="horizontal">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="95dp"
             android:layout_height="match_parent"
             android:layout_margin="5dp"
-            android:layout_weight="1"
             android:background="#BDBDBD"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            >
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -96,20 +96,22 @@
                     android:id="@+id/changeClassbtn"
                     android:layout_width="0dp"
                     android:layout_weight="1"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_gravity="bottom"
                     android:layout_marginTop="2dp"
                     android:text="ChangeClass"
-                    android:textSize="8dp" />
+                    android:textSize="7dp" />
 
                 <ToggleButton
                     android:id="@+id/toggleButton"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_gravity="bottom"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginBottom="1dp"
                     android:layout_weight="1"
                     android:textOff="Cross"
+                    android:textSize="10dp"
                     android:textOn="Rect"/>
             </LinearLayout>
 
@@ -145,10 +147,12 @@
 
         <ImageView
             android:id="@+id/iv"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="right"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|center_horizontal"
             android:adjustViewBounds="true"
+            android:layout_margin="4dp"
+
             android:src="@drawable/no_images" />
 
     </LinearLayout>

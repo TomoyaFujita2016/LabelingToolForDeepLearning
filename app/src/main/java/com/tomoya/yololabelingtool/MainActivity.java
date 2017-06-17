@@ -135,8 +135,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
             if (toggleButton.isChecked()) {
                 newXY1[0] = (int) event.getX();
                 newXY1[1] = (int) event.getY();
-                canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1, classNames[classNumber], Color.RED, 0, false);
                 Log.d("NORMAL", startPoint[0] + "  " + startPoint[1] + "  " + newXY1[0] + "  " + newXY1[1]);
+                //TODO classNames was accessed wrong index
+                if (classCount != 0)
+                    canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1, classNames[classNumber], Color.RED, 0, false);
+                if (classCount == 0)
+                    canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1, "NULL", Color.RED, 0, false);
 
                 if (event.getActionMasked() == MotionEvent.ACTION_UP) {
                     Log.d("ACTION_UP", startPoint[0] + "  " + startPoint[1] + "  " + newXY1[0] + "  " + newXY1[1]);
@@ -193,9 +197,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
             sdPath = extDirs[extDirs.length - 1].toString();
 
             File imagesDir = new File(sdPath + "/images");
-            if (!(imagesDir.exists()))
+            if (!(imagesDir.exists())) {
                 imagesDir.mkdir();
-
+            }
 
             tmpFiles = new File(imagesDir.getPath()).listFiles();
 

@@ -160,7 +160,6 @@ public class CanvasBitmap {
             rectEndXY[0] = endXY[0];
             rectEndXY[1] = endXY[1];
 
-            paintRect.setColor(color);
             paintRect.setStrokeWidth(thickness);
             paintRect.setColor(color);
 
