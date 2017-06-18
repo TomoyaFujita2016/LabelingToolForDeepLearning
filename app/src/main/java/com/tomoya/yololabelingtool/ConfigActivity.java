@@ -50,6 +50,7 @@ public class ConfigActivity extends Activity implements View.OnClickListener {
 
         linearLayout = (LinearLayout) findViewById(R.id.classList);
         editText = (EditText) findViewById(R.id.edit);
+        editText.setSelectAllOnFocus(true);
         classData = getSharedPreferences("ClassDataSave", Context.MODE_PRIVATE);
         editor = classData.edit();
     }

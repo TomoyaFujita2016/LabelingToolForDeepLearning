@@ -119,6 +119,12 @@ public class CanvasBitmap {
         makeRatio();
     }
 
+    public void resetCanvas(int imageNumber){
+        tmpBitmap = BitmapFactory.decodeFile(images[imageNumber].getPath(), options).copy(Bitmap.Config.ARGB_8888, true);
+        canvas.drawBitmap(tmpBitmap, 0, 0, null);
+        imageView.setImageBitmap(tmpBitmap);
+    }
+
     private void makeRatio() {
 
         float a = bitmap.getWidth();

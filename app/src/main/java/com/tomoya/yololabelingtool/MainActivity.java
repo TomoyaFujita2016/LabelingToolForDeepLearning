@@ -3,6 +3,7 @@ package com.tomoya.yololabelingtool;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -24,6 +25,8 @@ import android.widget.ToggleButton;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import static android.content.ContentValues.TAG;
 
@@ -48,13 +51,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private int[] newXY1, newXY2, oldXY1, oldXY2;
     private int[] startPoint;
     private int[] pointerIDs;
-    private int ptrIndex;
     private boolean byFirstTouch = true;
     private boolean byExistImage = false;
     private int[] rectStartXY;
     private File[] images;
     private int[] rectEndXY;
-    private int[] colors;
     private String sdPath;
     private String label;
     private BufferedWriter bw;
@@ -64,9 +65,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private ToggleButton toggleButton;
     private Toast shortToast;
     private String annotation;
-
-    private int pointerID1, pointerID2;
-    //private int[] newX, newY, oldX, oldY;
+    TypedArray colors;
+    int colorIndex = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,13 +85,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         pointerIDs = new int[2];
         rectStartXY = new int[2];
         rectEndXY = new int[2];
-        colors = new int[5];
-        colors[0] = 0x00FF0000;
-        colors[1] = 0x0000FF00;
-        colors[2] = 0x000000FF;
-        colors[3] = 0x00FFFF00;
-        colors[4] = 0x0000FFFF;
 
+
+        colors = getResources().obtainTypedArray(R.array.colorList);
         shortToast = Toast.makeText(this, "This Toast has No Text.", Toast.LENGTH_SHORT);
         loadButton = (ImageButton) findViewById(R.id.loadBtn);
         changeClassButton = (Button) findViewById(R.id.changeClassbtn);
@@ -134,6 +130,16 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private void initialization() {
         classNumber = 0;
         imageNumber = 0;
+        colorIndex = 0;
+    }
+
+    private String getNameWithoutExtension(File file) {
+        String fileName = file.getName();
+        int index = fileName.lastIndexOf('.');
+        if (index != -1) {
+            return fileName.substring(0, index);
+        }
+        return "";
     }
 
     @Override
@@ -145,21 +151,22 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 newXY1[1] = (int) event.getY();
                 Log.d("NORMAL", startPoint[0] + "  " + startPoint[1] + "  " + newXY1[0] + "  " + newXY1[1]);
                 if (classCount != 0)
-                    canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1, classNames[classNumber], Color.RED, 0, false);
+                    canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1, classNames[classNumber], colors.getColor(colorIndex, 0), 0, false);
                 if (classCount == 0)
-                    canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1, "NULL", Color.RED, 0, false);
+                    canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1, "NULL", colors.getColor(colorIndex, 0), 0, false);
 
                 if (event.getActionMasked() == MotionEvent.ACTION_UP) {
                     Log.d("ACTION_UP", startPoint[0] + "  " + startPoint[1] + "  " + newXY1[0] + "  " + newXY1[1]);
 
                     if (classCount != 0) {
-                        annotation = classNumber + " " + canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1, classNames[classNumber], Color.RED, 0, true);
+                        annotation = classNumber + " " + canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1, classNames[classNumber], colors.getColor(colorIndex, 0), 0, true);
                         Log.i("ANNOTATION", annotation);
                         addViewToLL(annotation);
+                        outputTextToSD(getNameWithoutExtension(images[imageNumber]), annotation);
 
                     }
                     if (classCount == 0)
-                        canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1, "NULL", Color.RED, 0, true);
+                        canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1, "NULL", colors.getColor(colorIndex, 0), 0, true);
 
                     toggleButton.setChecked(false);
                     byFirstTouch = true;
@@ -175,7 +182,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 if (!byFirstTouch) {
                     startPoint[0] += (newXY1[0] - oldXY1[0]) / 2;
                     startPoint[1] += (newXY1[1] - oldXY1[1]) / 2;
-                    canvasBitmap.drawCrossHair(imageNumber, startPoint, Color.WHITE, 0);
+                    canvasBitmap.drawCrossHair(imageNumber, startPoint, Color.BLACK, 0);
 
                 }
                 oldXY1[0] = (int) event.getX();
@@ -206,6 +213,48 @@ public class MainActivity extends Activity implements View.OnClickListener {
         textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 10);
         textView.setTextColor(Color.BLACK);
         listLinearLayout.addView(textView);
+    }
+
+    private void removeTextInSD(String fileName) {
+        File[] extDirs = getExternalFilesDirs(Environment.DIRECTORY_PICTURES);
+        if (extDirs.length != 1) {
+            sdPath = extDirs[extDirs.length - 1].toString();
+            File newFile = new File(sdPath + "/texts/" + fileName + ".txt");
+            if (newFile.exists()) {
+                newFile.delete();
+            }
+        }
+    }
+
+    private void outputTextToSD(String fileName, String text) {
+        File[] extDirs = getExternalFilesDirs(Environment.DIRECTORY_PICTURES);
+        if (extDirs.length != 1) {
+            sdPath = extDirs[extDirs.length - 1].toString();
+
+            File textsDir = new File(sdPath + "/texts");
+            if (!(textsDir.exists())) {
+                textsDir.mkdir();
+            }
+            File newFile = new File(sdPath + "/texts/" + fileName + ".txt");
+            if (!(newFile.exists())) {
+                try {
+                    newFile.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            try {
+                FileWriter fileWriter = new FileWriter(newFile, true);
+                fileWriter.write(text + "\r\n");
+                fileWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+        } else {
+            cancelShowToast("SAVE FAILED!\nNO SD CARD !");
+        }
     }
 
     private boolean importImagesFromSD() {
@@ -359,11 +408,18 @@ public class MainActivity extends Activity implements View.OnClickListener {
         if (classNumber == classCount)
             classNumber = 0;
 
+        colorIndex = classNumber;
+        if (colors.length() <= colorIndex)
+            colorIndex = 0;
         classNameChange();
 
     }
 
     private void onClearBtn() {
+        if (byExistImage) {
+            removeTextInSD(getNameWithoutExtension(images[imageNumber]));
+            canvasBitmap.resetCanvas(imageNumber);
+        }
         listLinearLayout.removeAllViews();
     }
 
@@ -380,6 +436,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             imageNumber++;
             editor.putInt("ImageNumber", imageNumber);
             editor.commit();
+            listLinearLayout.removeAllViews();
             displayImageData();
             displayImage(imageNumber);
         } else cancelShowToast("UPPER LIMIT !");
@@ -393,10 +450,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
             imageNumber--;
             editor.putInt("ImageNumber", imageNumber);
             editor.commit();
+            listLinearLayout.removeAllViews();
             displayImageData();
             displayImage(imageNumber);
-        }
-        cancelShowToast("LOWER LIMIT !");
+        } else cancelShowToast("LOWER LIMIT !");
 
 
     }

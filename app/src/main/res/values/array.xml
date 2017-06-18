@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <array name="colorList">
+        <item>#CC0000</item>
+        <item>#FF8800</item>
+        <item>#669900</item>
+        <item>#9933CC</item>
+        <item>#0099CC</item>
+        <item>#08088A</item>
+        <item>#FE2EF7</item>
+        <item>#0B615E</item>
+        <item>#8A084B</item>
+        <item>#BEF781</item>
+        <item>#81F781</item>
+        <item>#81F7BE</item>
+        <item>#81F7F3</item>
+        <item>#81BEF7</item>
+        <item>#8181F7</item>
+        <item>#BE81F7</item>
+        <item>#F781F3</item>
+        <item>#F781BE</item>
+
+    </array>
+
+</resources>
