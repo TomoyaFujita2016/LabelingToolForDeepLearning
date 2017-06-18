@@ -93,7 +93,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         rectStartXY = new int[2];
         rectEndXY = new int[2];
 
-
+        classNames = null;
         colors = getResources().obtainTypedArray(R.array.colorList);
         shortToast = Toast.makeText(this, "This Toast has No Text.", Toast.LENGTH_SHORT);
         loadButton = (ImageButton) findViewById(R.id.loadBtn);
@@ -431,7 +431,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         int[] eXY = new int[2];
         String className;
         int colorIdx;
-        if (annotationData.length != 0) {
+        if (classCount != 0 && annotationData.length != 0) {
             for (int i = 0; i < annotationData.length; i++) {
                 width = (int) (annotationData[i][3] * canvasBitmap.imageSizeW[imageNumber]);
                 height = (int) (annotationData[i][4] * canvasBitmap.imageSizeH[imageNumber]);
@@ -445,6 +445,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
                 if (classNames.length <= (int) annotationData[i][0]) {
                     className = "ClassNum: " + (int) annotationData[i][0];
+                    cancelShowToast("CLASS IS NOT ENOUGH TO DRAW RECTS!");
                 } else {
                     className = classNames[(int) annotationData[i][0]];
                 }
@@ -458,6 +459,28 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 canvasBitmap.drawRectangle(imageNumber, sXY, eXY, className, colors.getColor(colorIdx, 0), 0, true);
                 addViewToLL((int) annotationData[i][0] + " " + annotationData[i][1] + " " + annotationData[i][2] + " " + annotationData[i][3] + " " + annotationData[i][4], colorIdx);
             }
+        }else {
+            for (int i = 0; i < annotationData.length; i++) {
+                width = (int) (annotationData[i][3] * canvasBitmap.imageSizeW[imageNumber]);
+                height = (int) (annotationData[i][4] * canvasBitmap.imageSizeH[imageNumber]);
+                centerX = (int) (annotationData[i][1] * canvasBitmap.imageSizeW[imageNumber]);
+                centerY = (int) (annotationData[i][2] * canvasBitmap.imageSizeH[imageNumber]);
+
+                sXY[0] = centerX - (width / 2);
+                sXY[1] = centerY - (height / 2);
+                eXY[0] = centerX + (width / 2);
+                eXY[1] = centerY + (height / 2);
+                if (colors.length() <= (int) annotationData[i][0]) {
+                    colorIdx = (int) annotationData[i][0] - colors.length();
+                } else {
+                    colorIdx = (int) annotationData[i][0];
+                }
+                className = "ClassNum: " + (int) annotationData[i][0];
+
+                canvasBitmap.drawRectangle(imageNumber, sXY, eXY, className, colors.getColor(colorIdx, 0), 0, true);
+                addViewToLL((int) annotationData[i][0] + " " + annotationData[i][1] + " " + annotationData[i][2] + " " + annotationData[i][3] + " " + annotationData[i][4], colorIdx);
+            }
+            cancelShowToast("CLASS IS NOT ENOUGH TO DRAW RECTS!");
         }
     }
 
