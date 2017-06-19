@@ -180,15 +180,17 @@ public class CanvasBitmap {
 
             paintRect.setStrokeWidth(thickness);
             paintRect.setColor(color);
+            paintRect.setTextSize(bitmap.getWidth()/50);
 
             canvas.drawBitmap(tmpBitmap, 0, 0, null);
 
+            paintRect.setStyle(Paint.Style.FILL_AND_STROKE);
             if (startXY[1] < 11 || endXY[1] < 11) {  //11 is about a letter height
                 canvas.drawText(className, startXY[0] + 1, startXY[1] + 11, paintRect);
             } else {
                 canvas.drawText(className, startXY[0], startXY[1] - 3, paintRect);
             }
-
+            paintRect.setStyle(Paint.Style.STROKE);
             Log.d("CANVAS", endXY[0] + " " + endXY[1]);
             canvas.drawRect(startXY[0], startXY[1], endXY[0], endXY[1], paintRect);
             imageView.setImageBitmap(bitmap);
@@ -197,14 +199,15 @@ public class CanvasBitmap {
             paintRect.setColor(color);
             paintRect.setStrokeWidth(thickness);
             paintRect.setColor(color);
+            paintRect.setTextSize(bitmap.getWidth()/50);
             canvas.drawBitmap(tmpBitmap, 0, 0, null);
-
+            paintRect.setStyle(Paint.Style.FILL_AND_STROKE);
             if (startXY[1] < 11 || endXY[1] < 11) {  //11 is about a height of letters
                 canvas.drawText(className, startXY[0] + 1, startXY[1] + 11, paintRect);
             } else {
                 canvas.drawText(className, startXY[0], startXY[1] - 3, paintRect);
             }
-
+            paintRect.setStyle(Paint.Style.STROKE);
             Log.d("CANVAS", endXY[0] + " " + endXY[1]);
             canvas.drawRect(startXY[0], startXY[1], endXY[0], endXY[1], paintRect);
             imageView.setImageBitmap(bitmap);
