@@ -226,7 +226,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         File[] extDirs = getExternalFilesDirs(Environment.DIRECTORY_PICTURES);
         if (extDirs.length != 1) {
             sdPath = extDirs[extDirs.length - 1].toString();
-            File newFile = new File(sdPath + "/texts/" + fileName + ".txt");
+            File tmpDir = new File(sdPath);
+            File newFile = new File(tmpDir.getParent()+ "/texts/" + fileName + ".txt");
             if (newFile.exists()) {
                 newFile.delete();
             }
@@ -239,7 +240,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         File[] extDirs = getExternalFilesDirs(Environment.DIRECTORY_PICTURES);
         if (extDirs.length != 1) {
             sdPath = extDirs[extDirs.length - 1].toString();
-            File newFile = new File(sdPath + "/texts/" + fileName + ".txt");
+            File tmpDir = new File(sdPath);
+            File newFile = new File(tmpDir.getParent() + "/texts/" + fileName + ".txt");
             if (newFile.exists()) {
                 try {
                     BufferedReader bufferedReader = new BufferedReader(new FileReader(newFile));
@@ -274,12 +276,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
         File[] extDirs = getExternalFilesDirs(Environment.DIRECTORY_PICTURES);
         if (extDirs.length != 1) {
             sdPath = extDirs[extDirs.length - 1].toString();
-
-            File textsDir = new File(sdPath + "/texts");
+            File tmpDir = new File(sdPath);
+            File textsDir = new File(tmpDir.getParent() + "/texts");
             if (!(textsDir.exists())) {
                 textsDir.mkdir();
             }
-            File newFile = new File(sdPath + "/texts/" + fileName + ".txt");
+            File newFile = new File(tmpDir.getParent() + "/texts/" + fileName + ".txt");
             if (!(newFile.exists())) {
                 try {
                     newFile.createNewFile();
@@ -307,8 +309,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         if (extDirs.length != 1) {
 
             sdPath = extDirs[extDirs.length - 1].toString();
-
-            File imagesDir = new File(sdPath + "/images");
+            File tmpDir = new File(sdPath);
+            File imagesDir = new File(tmpDir.getParent() + "/images");
             if (!(imagesDir.exists())) {
                 imagesDir.mkdir();
             }
@@ -380,7 +382,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onResume() {
         super.onResume();
-
+        listLinearLayout.removeAllViews();
         byExistImage = importImagesFromSD();
         getDataFromSP();
         classNameChange();
@@ -397,7 +399,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
-        if (inputTextFromSD(getNameWithoutExtension(images[imageNumber])))
+        if (byExistImage && inputTextFromSD(getNameWithoutExtension(images[imageNumber])))
             restoreTheRects();
     }
 
@@ -524,8 +526,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         if (byExistImage) {
             removeTextInSD(getNameWithoutExtension(images[imageNumber]));
             canvasBitmap.resetCanvas(imageNumber);
+            annotationData = null;
         }
-        annotationData = null;
+
         listLinearLayout.removeAllViews();
     }
 
@@ -572,11 +575,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private void onLoadBtn() {
         Log.d(TAG, "Clicked onLoadButton");
+        listLinearLayout.removeAllViews();
         byExistImage = importImagesFromSD();
         initialization();
-        displayImageData();
-        displayImage(imageNumber);
-        if (inputTextFromSD(getNameWithoutExtension(images[imageNumber])))
+        if (byExistImage) {
+            displayImageData();
+            displayImage(imageNumber);
+        }
+        if (byExistImage && inputTextFromSD(getNameWithoutExtension(images[imageNumber])))
             restoreTheRects();
     }
 }
