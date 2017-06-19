@@ -61,7 +61,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="CLASS_NAME" />
+                android:text="CLASS_NAME"
+                android:inputType="text"/>
 
             <Button
                 android:id="@+id/addClassBtn"
