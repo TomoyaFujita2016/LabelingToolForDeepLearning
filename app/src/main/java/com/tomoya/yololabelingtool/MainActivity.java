@@ -227,7 +227,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         if (extDirs.length != 1) {
             sdPath = extDirs[extDirs.length - 1].toString();
             File tmpDir = new File(sdPath);
-            File newFile = new File(tmpDir.getParent()+ "/texts/" + fileName + ".txt");
+            File newFile = new File(tmpDir.getParent() + "/texts/" + fileName + ".txt");
             if (newFile.exists()) {
                 newFile.delete();
             }
@@ -236,70 +236,79 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private boolean inputTextFromSD(String fileName) {
         List<String> tmp = new ArrayList<>();
-
-        File[] extDirs = getExternalFilesDirs(Environment.DIRECTORY_PICTURES);
-        if (extDirs.length != 1) {
-            sdPath = extDirs[extDirs.length - 1].toString();
-            File tmpDir = new File(sdPath);
-            File newFile = new File(tmpDir.getParent() + "/texts/" + fileName + ".txt");
-            if (newFile.exists()) {
-                try {
-                    BufferedReader bufferedReader = new BufferedReader(new FileReader(newFile));
-                    String line;
-                    while ((line = bufferedReader.readLine()) != null) {
-                        tmp.add(line);
+        try {
+            File[] extDirs = getExternalFilesDirs(Environment.DIRECTORY_PICTURES);
+            if (extDirs.length != 1) {
+                sdPath = extDirs[extDirs.length - 1].toString();
+                File tmpDir = new File(sdPath);
+                File newFile = new File(tmpDir.getParent() + "/texts/" + fileName + ".txt");
+                if (newFile.exists()) {
+                    try {
+                        BufferedReader bufferedReader = new BufferedReader(new FileReader(newFile));
+                        String line;
+                        while ((line = bufferedReader.readLine()) != null) {
+                            tmp.add(line);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
 
-                annotationData = new float[tmp.size()][5];
+                    annotationData = new float[tmp.size()][5];
 
-                for (int i = 0; i < tmp.size(); i++) {
-                    String[] strings = tmp.get(i).split(" ");
-                    for (int n = 0; n < 5; n++) {
-                        annotationData[i][n] = Float.parseFloat(strings[n]);
+                    for (int i = 0; i < tmp.size(); i++) {
+                        String[] strings = tmp.get(i).split(" ");
+                        for (int n = 0; n < 5; n++) {
+                            annotationData[i][n] = Float.parseFloat(strings[n]);
+                        }
+                        annotationData[i][0] = (int) annotationData[i][0];
                     }
-                    annotationData[i][0] = (int) annotationData[i][0];
-                }
 
-                return true;
-            } else {
-                Log.i("INPUT_TEXT", "The Text File doesn't exist.");
+                    return true;
+                } else {
+                    Log.i("INPUT_TEXT", "The Text File doesn't exist.");
+                    return false;
+                }
+            } else
                 return false;
-            }
-        } else
+        } catch (Exception e) {
+            cancelShowToast("ERROR: INPUT TEXT FILE");
             return false;
+        }
     }
 
     private boolean outputTextToSD(String fileName, String text) {
         File[] extDirs = getExternalFilesDirs(Environment.DIRECTORY_PICTURES);
-        if (extDirs.length != 1) {
-            sdPath = extDirs[extDirs.length - 1].toString();
-            File tmpDir = new File(sdPath);
-            File textsDir = new File(tmpDir.getParent() + "/texts");
-            if (!(textsDir.exists())) {
-                textsDir.mkdir();
-            }
-            File newFile = new File(tmpDir.getParent() + "/texts/" + fileName + ".txt");
-            if (!(newFile.exists())) {
+        try {
+            if (extDirs.length != 1) {
+                sdPath = extDirs[extDirs.length - 1].toString();
+                File tmpDir = new File(sdPath);
+                File textsDir = new File(tmpDir.getParent() + "/texts");
+                if (!(textsDir.exists())) {
+                    textsDir.mkdir();
+                }
+                File newFile = new File(tmpDir.getParent() + "/texts/" + fileName + ".txt");
+                if (!(newFile.exists())) {
+                    try {
+                        newFile.createNewFile();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
                 try {
-                    newFile.createNewFile();
+                    FileWriter fileWriter = new FileWriter(newFile, true);
+                    fileWriter.write(text + "\r\n");
+                    fileWriter.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            }
-            try {
-                FileWriter fileWriter = new FileWriter(newFile, true);
-                fileWriter.write(text + "\r\n");
-                fileWriter.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
 
-        return true;
-        } else {
-            cancelShowToast("SAVE FAILED!\nNO SD CARD !");
+                return true;
+            } else {
+                cancelShowToast("SAVE FAILED!\nNO SD CARD !");
+                return false;
+            }
+        }catch (Exception e){
+            cancelShowToast("ERROR: OUTPUT TEXT FILE");
             return false;
         }
     }
@@ -320,12 +329,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
             if (tmpFiles.length != 0) {
                 imageCount = 0;
                 for (int i = 0; i < tmpFiles.length; i++) {
-                    if (tmpFiles[i].isFile() && (tmpFiles[i].getPath().endsWith(".jpg") || tmpFiles[i].getPath().endsWith(".png")))
+                    if (tmpFiles[i].isFile() && (tmpFiles[i].getPath().endsWith(".jpg") || tmpFiles[i].getPath().endsWith(".png") || tmpFiles[i].getPath().endsWith(".jpeg")))
                         imageCount++;
                 }
                 images = new File[imageCount];
                 for (int i = 0, n = 0; i < tmpFiles.length; i++) {
-                    if (tmpFiles[i].isFile() && (tmpFiles[i].getPath().endsWith(".jpg") || tmpFiles[i].getPath().endsWith(".png"))) {
+                    if (tmpFiles[i].isFile() && (tmpFiles[i].getPath().endsWith(".jpg") || tmpFiles[i].getPath().endsWith(".png") ||tmpFiles[i].getPath().endsWith(".jpeg"))) {
                         images[n] = tmpFiles[i];
                         n++;
                     }
@@ -386,9 +395,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
         byExistImage = importImagesFromSD();
         getDataFromSP();
         classNameChange();
-        displayImageData();
-        displayImage(imageNumber);
-
+        if (byExistImage) {
+            try {
+                displayImageData();
+                displayImage(imageNumber);
+            } catch (Exception e) {
+                cancelShowToast("ERROR: DISPLAY IMAGE DATA");
+            }
+        }
 
     }
 
@@ -420,7 +434,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void displayImageData() {
-        if (imageCount != 0) {
+        if (byExistImage) {
             imageNumTv.setText(imageNumber + 1 + " / " + imageCount);
             imageNameTv.setText(images[imageNumber].getName());
             imageSizeTv.setText(canvasBitmap.imageSizeW[imageNumber] + " × " + canvasBitmap.imageSizeH[imageNumber]);
@@ -461,7 +475,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 canvasBitmap.drawRectangle(imageNumber, sXY, eXY, className, colors.getColor(colorIdx, 0), 0, true);
                 addViewToLL((int) annotationData[i][0] + " " + annotationData[i][1] + " " + annotationData[i][2] + " " + annotationData[i][3] + " " + annotationData[i][4], colorIdx);
             }
-        }else {
+        } else {
             for (int i = 0; i < annotationData.length; i++) {
                 width = (int) (annotationData[i][3] * canvasBitmap.imageSizeW[imageNumber]);
                 height = (int) (annotationData[i][4] * canvasBitmap.imageSizeH[imageNumber]);
