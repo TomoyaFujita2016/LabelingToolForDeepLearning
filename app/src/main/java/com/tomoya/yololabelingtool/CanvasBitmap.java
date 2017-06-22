@@ -109,14 +109,20 @@ public class CanvasBitmap {
         }
     }
 
-    private void fileToBitmap(int imageNumber, boolean by0) {
-        if (saveImageNumber != imageNumber || by0) {
-            bitmap = BitmapFactory.decodeFile(images[imageNumber].getPath(), options);
-            tmpBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
-            canvas = new Canvas(bitmap);
+    private Boolean fileToBitmap(int imageNumber, boolean by0) {
+        try {
+            if (saveImageNumber != imageNumber || by0) {
+                bitmap = BitmapFactory.decodeFile(images[imageNumber].getPath(), options);
+                tmpBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+                canvas = new Canvas(bitmap);
+            }
+            saveImageNumber = imageNumber;
+            makeRatio();
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
         }
-        saveImageNumber = imageNumber;
-        makeRatio();
+        return true;
     }
 
     public void resetCanvas(int imageNumber) {
@@ -136,8 +142,9 @@ public class CanvasBitmap {
         imageRatio[1] = a / b;
     }
 
-    public void drawCrossHair(int imageNumber, int[] XY, int color, int thickness) {
-        fileToBitmap(imageNumber, false);
+    public boolean drawCrossHair(int imageNumber, int[] XY, int color, int thickness) {
+        if(!(fileToBitmap(imageNumber, false)))
+            return false;
         //XY = changeImageRatio(XY);
 
         XY = ToInner(XY);
@@ -153,7 +160,7 @@ public class CanvasBitmap {
         canvas.drawLine(0, XY[1], bitmap.getWidth(), XY[1], paintCrossHair);
         canvas.drawLine(XY[0], 0, XY[0], bitmap.getHeight(), paintCrossHair);
         imageView.setImageBitmap(bitmap);
-
+        return true;
 
     }
 
@@ -165,8 +172,10 @@ public class CanvasBitmap {
     }
 
     public String drawRectangle(int imageNumber, int[] startXY, int[] endXY, String className, int color, int thickness, boolean bySave) {
-        fileToBitmap(imageNumber, false);
-
+        if(!(fileToBitmap(imageNumber, false))) {
+            imageView.setImageResource(R.drawable.error_image);
+            return null;
+        }
         if (!bySave) {
             //startXY = GLtoLC(startXY);
             startXY = ToInner(startXY);

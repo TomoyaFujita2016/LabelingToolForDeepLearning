@@ -156,6 +156,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             if (toggleButton.isChecked()) {
                 newXY1[0] = (int) event.getX();
                 newXY1[1] = (int) event.getY();
+                newXY1[1] = (int) event.getY();
                 Log.d("NORMAL", startPoint[0] + "  " + startPoint[1] + "  " + newXY1[0] + "  " + newXY1[1]);
                 if (classCount != 0)
                     canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1, classNames[classNumber], colors.getColor(colorIndex, 0), 0, false);
@@ -189,7 +190,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 if (!byFirstTouch) {
                     startPoint[0] += (newXY1[0] - oldXY1[0]) / 2;
                     startPoint[1] += (newXY1[1] - oldXY1[1]) / 2;
-                    canvasBitmap.drawCrossHair(imageNumber, startPoint, Color.BLACK, 0);
+                    if(!(canvasBitmap.drawCrossHair(imageNumber, startPoint, Color.BLACK, 0)))
+                        cancelShowToast("ERROR: LOAD IMAGE");
+
 
                 }
                 oldXY1[0] = (int) event.getX();
