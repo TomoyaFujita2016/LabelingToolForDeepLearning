@@ -85,6 +85,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initializationANDsetOnClickListener();
+
+        setImageViewsGone(0);
     }
 
     private void initializationANDsetOnClickListener() {
@@ -514,8 +516,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void setImageViewsGone(int ivNum) {
-        for (int i = 0; i < imageViews.length; i++)
+        for (int i = 0; i < imageViews.length; i++) {
             imageViews[i].setVisibility(View.GONE);
+            imageViews[i].setBackgroundColor(Color.WHITE);
+        }
         imageViews[ivNum].setVisibility(View.VISIBLE);
     }
 

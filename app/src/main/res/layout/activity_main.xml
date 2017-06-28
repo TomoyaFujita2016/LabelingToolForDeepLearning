@@ -200,15 +200,18 @@
 
 
             <ImageView
+                android:layout_margin="3dp"
                 android:background="@color/colorPrimaryDark"
-                android:padding="20dp"
-                android:src="@drawable/load"
-                android:visibility="visible"
+                android:padding="8dp"
+                android:visibility="gone"
                 android:id="@+id/leftTopIv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="true"/>
             <ImageView
+                android:layout_margin="3dp"
+                android:padding="8dp"
+                android:background="@color/colorPrimaryDark"
                 android:visibility="gone"
                 android:id="@+id/rightTopIv"
                 android:layout_width="wrap_content"
@@ -216,14 +219,18 @@
                 android:layout_alignParentRight="true"
                 android:adjustViewBounds="true"/>
             <ImageView
+                android:layout_margin="3dp"
                 android:visibility="gone"
+                android:background="@color/colorPrimaryDark"
                 android:id="@+id/leftBottomIv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:adjustViewBounds="true"/>
             <ImageView
+                android:layout_margin="3dp"
                 android:visibility="gone"
+                android:background="@color/colorPrimaryDark"
                 android:id="@+id/rightBottomIv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
