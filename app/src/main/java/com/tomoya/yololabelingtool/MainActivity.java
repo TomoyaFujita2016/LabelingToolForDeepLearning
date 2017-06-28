@@ -517,11 +517,17 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void setImageViewsGone(int ivNum) {
-        for (int i = 0; i < imageViews.length; i++) {
-            imageViews[i].setVisibility(View.GONE);
-            imageViews[i].setBackgroundColor(Color.WHITE);
+        if (ivNum != -1) {
+            for (int i = 0; i < imageViews.length; i++) {
+                imageViews[i].setVisibility(View.GONE);
+                imageViews[i].setBackgroundColor(Color.WHITE);
+            }
+            imageViews[ivNum].setVisibility(View.VISIBLE);
+        }else if(ivNum == -1){
+            for (int i = 0; i < imageViews.length; i++) {
+                imageViews[i].setVisibility(View.GONE);
+            }
         }
-        imageViews[ivNum].setVisibility(View.VISIBLE);
     }
 
 
