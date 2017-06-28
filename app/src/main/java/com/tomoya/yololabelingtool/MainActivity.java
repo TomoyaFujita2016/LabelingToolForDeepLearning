@@ -465,8 +465,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inMutable = true;
             Bitmap bitmap = canvasBitmap.bitmap.copy(Bitmap.Config.ARGB_8888, true);
-            width = bitmap.getWidth();
-            height = bitmap.getHeight();
+            width = imageView.getWidth();
+            height = imageView.getHeight();
             int rectWidth = (int) (width * ZoomRatio);
             int rectHeight = (int) (height * ZoomRatio);
 
@@ -484,29 +484,29 @@ public class MainActivity extends Activity implements View.OnClickListener {
             try {
                 canvas.drawBitmap(bitmap, rect, rectAll, paint);
 
-                if (canvasBitmap.touchPointOnView[0] < (width / 2) && canvasBitmap.touchPointOnView[1] < (height / 2)) {   //left top
-                    setImageViewsGone(0);
-                    imageViews[0].setMaxWidth(rect.width());
-                    imageViews[0].setMaxHeight(rect.height());
-                    imageViews[0].setImageBitmap(windowBitmap);
+                if (canvasBitmap.touchPointOnView[0] < (bitmap.getWidth() / 2) && canvasBitmap.touchPointOnView[1] < (bitmap.getHeight() / 2)) {   //left top
+                    setImageViewsGone(3);
+                    imageViews[3].setMaxWidth(rect.width());
+                    imageViews[3].setMaxHeight(rect.height());
+                    imageViews[3].setImageBitmap(windowBitmap);
                 }
-                if (canvasBitmap.touchPointOnView[0] < (width / 2) && canvasBitmap.touchPointOnView[1] >= (height / 2)) {   //left bottom
-                    setImageViewsGone(1);
-                    imageViews[1].setMaxWidth(rect.width());
-                    imageViews[1].setMaxHeight(rect.height());
-                    imageViews[1].setImageBitmap(windowBitmap);
-                }
-                if (canvasBitmap.touchPointOnView[0] >= (width / 2) && canvasBitmap.touchPointOnView[1] < (height / 2)) {   //right top
+                if (canvasBitmap.touchPointOnView[0] < (bitmap.getWidth() / 2) && canvasBitmap.touchPointOnView[1] >= (bitmap.getHeight() / 2)) {   //left bottom
                     setImageViewsGone(2);
                     imageViews[2].setMaxWidth(rect.width());
                     imageViews[2].setMaxHeight(rect.height());
                     imageViews[2].setImageBitmap(windowBitmap);
                 }
-                if (canvasBitmap.touchPointOnView[0] >= (width / 2) && canvasBitmap.touchPointOnView[1] >= (height / 2)) {   //right bottom
-                    setImageViewsGone(3);
-                    imageViews[3].setMaxWidth(rect.width());
-                    imageViews[3].setMaxHeight(rect.height());
-                    imageViews[3].setImageBitmap(windowBitmap);
+                if (canvasBitmap.touchPointOnView[0] >= (bitmap.getWidth() / 2) && canvasBitmap.touchPointOnView[1] < (bitmap.getHeight() / 2)) {   //right top
+                    setImageViewsGone(1);
+                    imageViews[1].setMaxWidth(rect.width());
+                    imageViews[1].setMaxHeight(rect.height());
+                    imageViews[1].setImageBitmap(windowBitmap);
+                }
+                if (canvasBitmap.touchPointOnView[0] >= (bitmap.getWidth() / 2) && canvasBitmap.touchPointOnView[1] >= (bitmap.getHeight() / 2)) {   //right bottom
+                    setImageViewsGone(0);
+                    imageViews[0].setMaxWidth(rect.width());
+                    imageViews[0].setMaxHeight(rect.height());
+                    imageViews[0].setImageBitmap(windowBitmap);
 
                 }
             } catch (Exception e) {
@@ -523,7 +523,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 imageViews[i].setBackgroundColor(Color.WHITE);
             }
             imageViews[ivNum].setVisibility(View.VISIBLE);
-        }else if(ivNum == -1){
+        } else if (ivNum == -1) {
             for (int i = 0; i < imageViews.length; i++) {
                 imageViews[i].setVisibility(View.GONE);
             }
