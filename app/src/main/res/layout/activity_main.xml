@@ -202,7 +202,7 @@
             <ImageView
                 android:layout_margin="3dp"
                 android:background="@color/colorPrimaryDark"
-                android:padding="8dp"
+                android:padding="9dp"
                 android:visibility="gone"
                 android:id="@+id/leftTopIv"
                 android:layout_width="wrap_content"
