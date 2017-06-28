@@ -21,7 +21,7 @@ import javax.microedition.khronos.opengles.GL;
 
 public class CanvasBitmap {
 
-    private Bitmap bitmap, tmpBitmap;
+
     private ImageView imageView;
     private Activity activity;
     private Canvas canvas;
@@ -33,10 +33,12 @@ public class CanvasBitmap {
     private SharedPreferences.Editor editor;
     private String data;
 
+    public Bitmap bitmap, tmpBitmap;
     public float[] imageRatio;
     public int[] crossHairXY;
     public int[] rectStartXY, rectEndXY;
     public int[] imageSizeH, imageSizeW;
+    public int[] touchPointOnView;
 
     CanvasBitmap(File[] images, ImageView imageView, Activity activity) {
         Log.d("Constructor", "Loaded Constructor");
@@ -46,6 +48,7 @@ public class CanvasBitmap {
         this.activity = activity;
 
         imageRatio = new float[2];
+        touchPointOnView = new int[2];
         options = new BitmapFactory.Options();
         options.inMutable = true;
         crossHairXY = new int[2];
@@ -151,6 +154,8 @@ public class CanvasBitmap {
         crossHairXY[0] = XY[0];
         crossHairXY[1] = XY[1];
 
+        touchPointOnView[0] = XY[0];
+        touchPointOnView[1] = XY[1];
         Log.d("CROSSHAIR", XY[0] + " " + XY[1]);
 
         paintCrossHair.setColor(color);
@@ -187,6 +192,9 @@ public class CanvasBitmap {
             rectEndXY[0] = endXY[0];
             rectEndXY[1] = endXY[1];
 
+            touchPointOnView[0] = endXY[0];
+            touchPointOnView[1] = endXY[1];
+
             paintRect.setStrokeWidth(thickness);
             paintRect.setColor(color);
             paintRect.setTextSize(bitmap.getWidth()/50);
@@ -218,6 +226,10 @@ public class CanvasBitmap {
             }
             paintRect.setStyle(Paint.Style.STROKE);
             Log.d("CANVAS", endXY[0] + " " + endXY[1]);
+
+            touchPointOnView[0] = endXY[0];
+            touchPointOnView[1] = endXY[1];
+
             canvas.drawRect(startXY[0], startXY[1], endXY[0], endXY[1], paintRect);
             imageView.setImageBitmap(bitmap);
             tmpBitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap().copy(Bitmap.Config.ARGB_8888, true);

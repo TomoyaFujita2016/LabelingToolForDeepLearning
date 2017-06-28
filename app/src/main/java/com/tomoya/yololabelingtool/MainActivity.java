@@ -6,8 +6,12 @@ import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.os.Environment;
 import android.os.Bundle;
 import android.util.Log;
@@ -73,6 +77,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private TypedArray colors;
     private int colorIndex = 0;
     private float[][] annotationData;
+    private ImageView[] imageViews;
 
 
     @Override
@@ -92,6 +97,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         pointerIDs = new int[2];
         rectStartXY = new int[2];
         rectEndXY = new int[2];
+        imageViews = new ImageView[4];
 
         classNames = null;
         colors = getResources().obtainTypedArray(R.array.colorList);
@@ -118,6 +124,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
         imageData = getSharedPreferences("ImageData", MODE_PRIVATE);
         editor = imageData.edit();
         imageNumTv = (TextView) findViewById(R.id.displayImageNum);
+        imageViews[0] = (ImageView) findViewById(R.id.leftTopIv);
+        imageViews[1] = (ImageView) findViewById(R.id.leftBottomIv);
+        imageViews[2] = (ImageView) findViewById(R.id.rightTopIv);
+        imageViews[3] = (ImageView) findViewById(R.id.rightBottomIv);
     }
 
     private void getDataFromSP() {
@@ -190,7 +200,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 if (!byFirstTouch) {
                     startPoint[0] += (newXY1[0] - oldXY1[0]) / 2;
                     startPoint[1] += (newXY1[1] - oldXY1[1]) / 2;
-                    if(!(canvasBitmap.drawCrossHair(imageNumber, startPoint, Color.BLACK, 0)))
+                    if (!(canvasBitmap.drawCrossHair(imageNumber, startPoint, Color.BLACK, 0)))
                         cancelShowToast("ERROR: LOAD IMAGE");
 
 
@@ -208,6 +218,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
         return true;
     }
+
 
     private void classNameChange() {
         if (classCount != 0)
@@ -310,7 +321,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 cancelShowToast("SAVE FAILED!\nNO SD CARD !");
                 return false;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             cancelShowToast("ERROR: OUTPUT TEXT FILE");
             return false;
         }
@@ -337,7 +348,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 }
                 images = new File[imageCount];
                 for (int i = 0, n = 0; i < tmpFiles.length; i++) {
-                    if (tmpFiles[i].isFile() && (tmpFiles[i].getPath().endsWith(".jpg") || tmpFiles[i].getPath().endsWith(".png") ||tmpFiles[i].getPath().endsWith(".jpeg"))) {
+                    if (tmpFiles[i].isFile() && (tmpFiles[i].getPath().endsWith(".jpg") || tmpFiles[i].getPath().endsWith(".png") || tmpFiles[i].getPath().endsWith(".jpeg"))) {
                         images[n] = tmpFiles[i];
                         n++;
                     }
@@ -443,6 +454,62 @@ public class MainActivity extends Activity implements View.OnClickListener {
             imageSizeTv.setText(canvasBitmap.imageSizeW[imageNumber] + " × " + canvasBitmap.imageSizeH[imageNumber]);
         }
     }
+
+    private void displayZoomImg() {
+        if (byExistImage) {
+            final double ZoomRatio = 0.28;
+            int width, height;
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inMutable = true;
+            Bitmap bitmap = canvasBitmap.bitmap.copy(Bitmap.Config.ARGB_8888, true);
+            width = bitmap.getWidth();
+            height = bitmap.getHeight();
+            int rectWidth = (int) (width * ZoomRatio);
+            int rectHeight = (int) (height * ZoomRatio);
+
+            Bitmap windowBitmap = Bitmap.createBitmap(rectWidth, rectHeight, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(windowBitmap);
+            Rect rect = new Rect(
+                    canvasBitmap.touchPointOnView[0] - (rectWidth / 2),
+                    canvasBitmap.touchPointOnView[1] - (rectHeight / 2),
+                    canvasBitmap.touchPointOnView[0] + (rectWidth / 2),
+                    canvasBitmap.touchPointOnView[1] + (rectHeight / 2));
+            Rect rectAll = new Rect(0, 0, rectWidth, rectWidth);
+            Paint paint = new Paint();
+            paint.setAntiAlias(true);
+            try {
+                canvas.drawBitmap(bitmap, rect, rectAll, paint);
+
+                if (canvasBitmap.touchPointOnView[0] < (width / 2) && canvasBitmap.touchPointOnView[1] < (height / 2)) {   //left top
+                    setImageViewsGone(0);
+                    imageViews[0].setImageBitmap(windowBitmap);
+                }
+                if (canvasBitmap.touchPointOnView[0] < (width / 2) && canvasBitmap.touchPointOnView[1] >= (height / 2)) {   //left bottom
+                    setImageViewsGone(1);
+                    imageViews[1].setImageBitmap(windowBitmap);
+                }
+                if (canvasBitmap.touchPointOnView[0] >= (width / 2) && canvasBitmap.touchPointOnView[1] < (height / 2)) {   //right top
+                    setImageViewsGone(2);
+                    imageViews[2].setImageBitmap(windowBitmap);
+                }
+                if (canvasBitmap.touchPointOnView[0] >= (width / 2) && canvasBitmap.touchPointOnView[1] >= (height / 2)) {   //right bottom
+                    setImageViewsGone(3);
+                    imageViews[3].setImageBitmap(windowBitmap);
+
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+    private void setImageViewsGone(int ivNum) {
+        for (int i = 0; i < imageViews.length; i++)
+            imageViews[i].setVisibility(View.GONE);
+        imageViews[ivNum].setVisibility(View.VISIBLE);
+    }
+
 
     private void restoreTheRects() {
         int width, height, centerX, centerY;
@@ -586,9 +653,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
             if (inputTextFromSD(getNameWithoutExtension(images[imageNumber])))
                 restoreTheRects();
         } else cancelShowToast("LOWER LIMIT !");
-
-
     }
+
 
     private void onLoadBtn() {
         Log.d(TAG, "Clicked onLoadButton");
