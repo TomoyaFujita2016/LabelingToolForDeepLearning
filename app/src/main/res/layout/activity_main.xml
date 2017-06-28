@@ -219,6 +219,7 @@
                 android:layout_alignParentRight="true"
                 android:adjustViewBounds="true"/>
             <ImageView
+                android:padding="8dp"
                 android:layout_margin="3dp"
                 android:visibility="gone"
                 android:background="@color/colorPrimaryDark"
@@ -228,6 +229,7 @@
                 android:layout_alignParentBottom="true"
                 android:adjustViewBounds="true"/>
             <ImageView
+                android:padding="3dp"
                 android:layout_margin="3dp"
                 android:visibility="gone"
                 android:background="@color/colorPrimaryDark"
