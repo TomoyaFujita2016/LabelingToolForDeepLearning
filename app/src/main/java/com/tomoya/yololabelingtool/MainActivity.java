@@ -86,7 +86,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
         setContentView(R.layout.activity_main);
         initializationANDsetOnClickListener();
 
-        setImageViewsGone(0);
     }
 
     private void initializationANDsetOnClickListener() {
@@ -175,9 +174,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 if (classCount == 0)
                     canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1, "NULL", colors.getColor(colorIndex, 0), 0, false);
 
+                displayZoomImg();
+
                 if (event.getActionMasked() == MotionEvent.ACTION_UP) {
                     Log.d("ACTION_UP", startPoint[0] + "  " + startPoint[1] + "  " + newXY1[0] + "  " + newXY1[1]);
-
+                    setImageViewsGone(-1);
                     if (classCount != 0) {
                         annotation = classNumber + " " + canvasBitmap.drawRectangle(imageNumber, startPoint, newXY1, classNames[classNumber], colors.getColor(colorIndex, 0), 0, true);
                         Log.i("ANNOTATION", annotation);
