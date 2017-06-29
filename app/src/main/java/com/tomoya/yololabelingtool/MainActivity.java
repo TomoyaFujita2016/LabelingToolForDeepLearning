@@ -473,11 +473,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
             Bitmap windowBitmap = Bitmap.createBitmap(rectWidth, rectHeight, Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(windowBitmap);
             Rect rect = new Rect(
-                    canvasBitmap.touchPointOnView[0] - (rectWidth / 2),
-                    canvasBitmap.touchPointOnView[1] - (rectHeight / 2),
-                    canvasBitmap.touchPointOnView[0] + (rectWidth / 2),
-                    canvasBitmap.touchPointOnView[1] + (rectHeight / 2));
-            Rect rectAll = new Rect(0, 0, rectWidth, rectWidth);
+                    canvasBitmap.touchPointOnView[0] - ((int) (bitmap.getWidth() * ZoomRatio) / 2),
+                    canvasBitmap.touchPointOnView[1] - ((int) (bitmap.getHeight() * ZoomRatio) / 2),
+                    canvasBitmap.touchPointOnView[0] + ((int) (bitmap.getWidth() * ZoomRatio) / 2),
+                    canvasBitmap.touchPointOnView[1] + ((int) (bitmap.getHeight() * ZoomRatio) / 2));
+            Rect rectAll = new Rect(0, 0, rectWidth, rectHeight);
             Paint paint = new Paint();
             paint.setAntiAlias(true);
 
@@ -486,26 +486,26 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
                 if (canvasBitmap.touchPointOnView[0] < (bitmap.getWidth() / 2) && canvasBitmap.touchPointOnView[1] < (bitmap.getHeight() / 2)) {   //left top
                     setImageViewsGone(3);
-                    imageViews[3].setMaxWidth(rect.width());
-                    imageViews[3].setMaxHeight(rect.height());
+                    imageViews[3].setMaxWidth(rectWidth);
+                    imageViews[3].setMaxHeight(rectHeight);
                     imageViews[3].setImageBitmap(windowBitmap);
                 }
                 if (canvasBitmap.touchPointOnView[0] < (bitmap.getWidth() / 2) && canvasBitmap.touchPointOnView[1] >= (bitmap.getHeight() / 2)) {   //left bottom
                     setImageViewsGone(2);
-                    imageViews[2].setMaxWidth(rect.width());
-                    imageViews[2].setMaxHeight(rect.height());
+                    imageViews[2].setMaxWidth(rectWidth);
+                    imageViews[2].setMaxHeight(rectHeight);
                     imageViews[2].setImageBitmap(windowBitmap);
                 }
                 if (canvasBitmap.touchPointOnView[0] >= (bitmap.getWidth() / 2) && canvasBitmap.touchPointOnView[1] < (bitmap.getHeight() / 2)) {   //right top
                     setImageViewsGone(1);
-                    imageViews[1].setMaxWidth(rect.width());
-                    imageViews[1].setMaxHeight(rect.height());
+                    imageViews[1].setMaxWidth(rectWidth);
+                    imageViews[1].setMaxHeight(rectHeight);
                     imageViews[1].setImageBitmap(windowBitmap);
                 }
                 if (canvasBitmap.touchPointOnView[0] >= (bitmap.getWidth() / 2) && canvasBitmap.touchPointOnView[1] >= (bitmap.getHeight() / 2)) {   //right bottom
                     setImageViewsGone(0);
-                    imageViews[0].setMaxWidth(rect.width());
-                    imageViews[0].setMaxHeight(rect.height());
+                    imageViews[0].setMaxWidth(rectWidth);
+                    imageViews[0].setMaxHeight(rectHeight);
                     imageViews[0].setImageBitmap(windowBitmap);
 
                 }
