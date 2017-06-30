@@ -121,7 +121,7 @@ public class CanvasBitmap {
             }
             saveImageNumber = imageNumber;
             makeRatio();
-        }catch (Exception e){
+        }catch (Throwable e){
             e.printStackTrace();
             return false;
         }

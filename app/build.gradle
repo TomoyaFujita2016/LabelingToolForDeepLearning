@@ -7,8 +7,8 @@ android {
         applicationId "com.tomoya.yololabelingtool"
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 5
-        versionName "2.0"
+        versionCode 7
+        versionName "2.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
