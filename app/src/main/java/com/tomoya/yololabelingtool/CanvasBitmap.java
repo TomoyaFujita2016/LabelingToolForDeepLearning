@@ -10,6 +10,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.File;
 
@@ -122,6 +123,7 @@ public class CanvasBitmap {
             saveImageNumber = imageNumber;
             makeRatio();
         }catch (Throwable e){
+            Toast.makeText(activity,"ERROR: TOO BIG SIZE OF IMAGE", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
             return false;
         }
