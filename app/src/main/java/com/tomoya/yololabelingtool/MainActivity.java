@@ -371,6 +371,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 if (tmpFiles.length != 0)
                     canvasBitmap = new CanvasBitmap(images, imageView, this);
 
+                if (imageCount < imageNumber)
+                    imageNumber = 0;
+                    editor.putInt("ImageNumber", 0);
+
                 return true;
             } else {
 
@@ -409,8 +413,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
     protected void onResume() {
         super.onResume();
         listLinearLayout.removeAllViews();
-        byExistImage = importImagesFromSD();
         getDataFromSP();
+        byExistImage = importImagesFromSD();
+
         classNameChange();
         if (byExistImage) {
             try {
