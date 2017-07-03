@@ -159,6 +159,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
         return "";
     }
+    private boolean byHidedFile(File file){
+        String filename = file.getName();
+        if (filename.substring(0, 0) != "."){
+            return true;
+        }
+        return false;
+    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -332,53 +339,72 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private boolean importImagesFromSD() {
         File[] extDirs = getExternalFilesDirs(Environment.DIRECTORY_PICTURES);
+
         if (extDirs.length != 1) {
+            try {
 
-            sdPath = extDirs[extDirs.length - 1].toString();
-            File tmpDir = new File(sdPath);
-            File imagesDir = new File(tmpDir.getParent() + "/images");
-            if (!(imagesDir.exists())) {
-                imagesDir.mkdir();
-            }
-
-            tmpFiles = new File(imagesDir.getPath()).listFiles();
-
-            if (tmpFiles.length != 0) {
-                imageCount = 0;
-                for (int i = 0; i < tmpFiles.length; i++) {
-                    if (tmpFiles[i].isFile() && (tmpFiles[i].getPath().endsWith(".jpg") || tmpFiles[i].getPath().endsWith(".png") || tmpFiles[i].getPath().endsWith(".jpeg")))
-                        imageCount++;
+                sdPath = extDirs[extDirs.length - 1].toString();
+                File tmpDir = new File(sdPath);
+                File imagesDir = new File(tmpDir.getParent() + "/images");
+                if (!(imagesDir.exists())) {
+                    imagesDir.mkdir();
                 }
-                images = new File[imageCount];
-                for (int i = 0, n = 0; i < tmpFiles.length; i++) {
-                    if (tmpFiles[i].isFile() && (tmpFiles[i].getPath().endsWith(".jpg") || tmpFiles[i].getPath().endsWith(".png") || tmpFiles[i].getPath().endsWith(".jpeg"))) {
-                        images[n] = tmpFiles[i];
-                        n++;
+
+                tmpFiles = new File(imagesDir.getPath()).listFiles();
+
+                if (tmpFiles.length != 0) {
+                    imageCount = 0;
+                    for (int i = 0; i < tmpFiles.length; i++) {
+                        if (tmpFiles[i].isFile() && !byHidedFile(tmpFiles[i])&& (tmpFiles[i].getPath().endsWith(".jpg") || tmpFiles[i].getPath().endsWith(".png") || tmpFiles[i].getPath().endsWith(".jpeg") || tmpFiles[i].getPath().endsWith(".JPG")||tmpFiles[i].getPath().endsWith(".PNG")))
+                            imageCount++;
                     }
-                }
-                for (int i = 0; i < images.length - 1; i++) {
-                    for (int j = images.length - 1; j > i; j--) {
-                        if (images[j].compareTo(images[j - 1]) < 0) {
-                            tmp = images[j - 1];
-                            images[j - 1] = images[j];
-                            images[j] = tmp;
+                    images = new File[imageCount];
+                    for (int i = 0, n = 0; i < tmpFiles.length; i++) {
+                        if (tmpFiles[i].isFile() && !byHidedFile(tmpFiles[i])&& (tmpFiles[i].getPath().endsWith(".jpg") || tmpFiles[i].getPath().endsWith(".png") || tmpFiles[i].getPath().endsWith(".jpeg")| tmpFiles[i].getPath().endsWith(".JPG")||tmpFiles[i].getPath().endsWith(".PNG"))) {
+                            images[n] = tmpFiles[i];
+                            n++;
                         }
                     }
-                }
-                editor.putInt("ImageCount", images.length);
-                editor.commit();
+                    for (int i = 0; i < images.length - 1; i++) {
+                        for (int j = images.length - 1; j > i; j--) {
+                            if (images[j].compareTo(images[j - 1]) < 0) {
+                                tmp = images[j - 1];
+                                images[j - 1] = images[j];
+                                images[j] = tmp;
+                            }
+                        }
+                    }
+                    editor.putInt("ImageCount", images.length);
+                    editor.commit();
 
-                if (tmpFiles.length != 0)
-                    canvasBitmap = new CanvasBitmap(images, imageView, this);
+                    if (images.length != 0)
+                        canvasBitmap = new CanvasBitmap(images, imageView, this);
+                    else{
+                        Toast.makeText(this,"ERROR: THIS DIR INCLUDE FILES, " +
+                                "BUT IT \n  HAS NO CORRESPONDING IMAGE FILES.\n" +
+                                "<EXAMPLE>: TOO BIG SIZE OF IMAGES, THE FILES IS ALL TEXT FILES.", Toast.LENGTH_LONG).show();
+                        return false;
+                    }
 
-                if (imageCount < imageNumber)
-                    imageNumber = 0;
+                    if (imageCount < imageNumber)
+                        imageNumber = 0;
                     editor.putInt("ImageNumber", 0);
 
-                return true;
-            } else {
+                    return true;
+                } else {
 
-                cancelShowToast("NOT FOUND IMAGE DATA !!");
+                    cancelShowToast("NOT FOUND IMAGE DATA !!");
+                    editor.putInt("ImageCount", 0);
+                    editor.putInt("ImageNumber", 0);
+                    editor.commit();
+                    imageCount = 0;
+                    imageNumber = 0;
+                    imageNumTv.setText(0 + " / " + 0);
+                    imageView.setImageResource(R.drawable.no_images);
+                    return false;
+                }
+            }catch (OutOfMemoryError e){
+                cancelShowToast("ERROR: THIS DIR INCLUDES TOO BIG SIZE OF IMAGE");
                 editor.putInt("ImageCount", 0);
                 editor.putInt("ImageNumber", 0);
                 editor.commit();

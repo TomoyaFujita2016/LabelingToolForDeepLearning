@@ -124,7 +124,7 @@ public class CanvasBitmap {
             makeRatio();
         }catch (Throwable e){
             Toast.makeText(activity,"ERROR: TOO BIG SIZE OF IMAGE", Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
         return true;
