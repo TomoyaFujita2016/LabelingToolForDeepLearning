@@ -10,8 +10,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.os.Environment;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,15 +23,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -169,7 +164,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        //Log.i("TOGGLE", toggleButton.isChecked() + "");
         if (byExistImage) {
             if (toggleButton.isChecked()) {
                 newXY1[0] = (int) event.getX();
@@ -273,8 +267,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
                         while ((line = bufferedReader.readLine()) != null) {
                             tmp.add(line);
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    } catch (Throwable e) {
+                        //e.printStackTrace();
                     }
 
                     annotationData = new float[tmp.size()][5];
@@ -314,16 +308,16 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 if (!(newFile.exists())) {
                     try {
                         newFile.createNewFile();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    } catch (Throwable e) {
+                        //e.printStackTrace();
                     }
                 }
                 try {
                     FileWriter fileWriter = new FileWriter(newFile, true);
                     fileWriter.write(text + "\r\n");
                     fileWriter.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (Throwable e) {
+                    //e.printStackTrace();
                 }
 
                 return true;
@@ -541,7 +535,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                //e.printStackTrace();
             }
 
         }
